@@ -14,7 +14,7 @@ export default function Home() {
 
         <p className='text-center'>Run your agency, in one place</p>
 
-        <div className='relative bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent'>
+        <div className='relative mt-0 bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent md:mt-44'>
           <h1 className='text-center text-7xl font-bold md:text-[230px]'>Elastrix</h1>
         </div>
         <div className='relative flex items-center justify-center md:mt-[-70px]'>
@@ -28,7 +28,7 @@ export default function Home() {
           <div className='absolute bottom-0 left-0 right-0 top-[50%] z-10 bg-gradient-to-t dark:from-background'></div>
         </div>
       </section>
-      <section className='mt-[-60px] flex flex-col items-center justify-center gap-4 md:!mt-20'>
+      <section id='pricing' className='mt-[-20px] flex flex-col items-center justify-center gap-4 md:!mt-40'>
         <h2 className='text-center text-4xl'> Choose what fits you right</h2>
         <p className='text-center text-muted-foreground'>
           Our straightforward pricing plans are tailored to meet your needs. If
