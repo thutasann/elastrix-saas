@@ -15,7 +15,7 @@ export default function Home() {
         <p className='text-center'>Run your agency, in one place</p>
 
         <div className='relative bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent'>
-          <h1 className='text-center text-9xl font-bold md:text-[300px]'>Elastrix</h1>
+          <h1 className='text-center text-7xl font-bold md:text-[230px]'>Elastrix</h1>
         </div>
         <div className='relative flex items-center justify-center md:mt-[-70px]'>
           <Image
