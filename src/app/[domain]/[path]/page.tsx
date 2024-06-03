@@ -1,7 +1,7 @@
 import React from 'react'
 
-function DomainPage() {
-  return <div>DomainPage</div>
+function DomainPatchPage() {
+  return <div>DomainPatchPage</div>
 }
 
-export default DomainPage
+export default DomainPatchPage
