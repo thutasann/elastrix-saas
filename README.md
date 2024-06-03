@@ -4,6 +4,10 @@ This is the Web Builder and Project Management SAAS.
 
 ## Scripts
 
+### ERD Generator
+
+- https://prisma-erd.simonknott.de/
+
 ### Prisma init
 
 ```bash
