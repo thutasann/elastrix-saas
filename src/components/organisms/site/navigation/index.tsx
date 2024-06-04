@@ -33,9 +33,11 @@ const Navigation = ({ user }: Props) => {
         </ul>
       </nav>
       <aside className='flex items-center gap-2'>
-        <Link href={'/agency'} className='rounded-md bg-primary p-2 px-4 text-white hover:bg-primary/80'>
-          Login
-        </Link>
+        {!user && (
+          <Link href={'/agency'} className='rounded-md bg-primary p-2 px-4 text-white hover:bg-primary/80'>
+            Login
+          </Link>
+        )}
         <UserButton />
         <ModeToggle />
       </aside>

@@ -1,5 +1,6 @@
 import Navigation from '@/components/organisms/site/navigation'
 import { ClerkProvider } from '@clerk/nextjs'
+import { currentUser } from '@clerk/nextjs/server'
 import { dark } from '@clerk/themes'
 import React from 'react'
 
@@ -7,7 +8,8 @@ interface ISiteLayout {
   children: React.ReactNode
 }
 
-function SiteLayout({ children }: ISiteLayout) {
+async function SiteLayout({ children }: ISiteLayout) {
+  const authUser = await currentUser()
   return (
     <ClerkProvider
       appearance={{
@@ -15,7 +17,7 @@ function SiteLayout({ children }: ISiteLayout) {
       }}
     >
       <main className='h-full'>
-        <Navigation />
+        <Navigation user={authUser} />
         {children}
       </main>
     </ClerkProvider>

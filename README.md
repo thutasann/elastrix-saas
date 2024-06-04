@@ -2,6 +2,8 @@
 
 This is the Web Builder and Project Management SAAS.
 
+![demo](./public/assets/preview.png)
+
 ## Scripts
 
 ### ERD Generator
@@ -24,4 +26,10 @@ npx prisma generate
 
 ```bash
 npx prisma format
+```
+
+### Prisma Studio
+
+```bash
+npx prisma studio
 ```
