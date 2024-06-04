@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky install",
+    "postinstall": "prisma generate",
     "pretty": "prettier --write \"./**/*.tsx\" \"./**/*.ts\""
   },
   "dependencies": {
