@@ -1,9 +1,9 @@
+import React from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
 import { ModeToggle } from '@/components/atoms/mode-toggle'
 import { UserButton } from '@clerk/nextjs'
 import { User } from '@clerk/nextjs/server'
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
 
 type Props = {
   user?: null | User
@@ -33,9 +33,16 @@ const Navigation = ({ user }: Props) => {
         </ul>
       </nav>
       <aside className='flex items-center gap-2'>
-        {!user && (
+        {!user ? (
           <Link href={'/agency'} className='rounded-md bg-primary p-2 px-4 text-white hover:bg-primary/80'>
             Login
+          </Link>
+        ) : (
+          <Link
+            href={'/agency'}
+            className='rounded-md bg-dark-tremor-brand-muted p-2 px-4 text-white hover:bg-primary/80'
+          >
+            Agency
           </Link>
         )}
         <UserButton />
