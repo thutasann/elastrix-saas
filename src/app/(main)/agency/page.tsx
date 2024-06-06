@@ -38,7 +38,7 @@ async function AgencyPage({ searchParams }: IAgencyPage) {
   return (
     <div className='mt-4 flex items-center justify-center'>
       <div className='max-w-[850px] rounded-xl border-[1px] p-4'>
-        <h1 className='text-3xl'>Create an Agency</h1>
+        <h1 className='mb-3 text-center text-2xl font-bold'>Create an Agency</h1>
         <AgencyDetails
           data={{
             companyEmail: authUser?.emailAddresses[0].emailAddress,
