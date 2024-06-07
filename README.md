@@ -9,8 +9,7 @@ This is the Web Builder and Project Management SAAS.
 - Nextjs
 - Clerk
 - Prisma
-- PlanetScale
-- MySql
+- MongoDB
 - Stripe
 - Shadcn UI
 - Uploadthings
@@ -44,22 +43,4 @@ npx prisma format
 
 ```bash
 npx prisma studio
-```
-
-## Platnet Scale
-
-### Run Database Locally
-
-```bash
-pscale connect elastrix main --port 3309
-```
-
-### Shell
-
-```bash
-pscale shell elastrix main
-```
-
-```bash
-pscale branch promote elastrix main
 ```
