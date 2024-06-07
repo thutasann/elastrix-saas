@@ -25,11 +25,11 @@ import FileUpload from '@/components/atoms/file-upload'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { NumberInput } from '@tremor/react'
-import { deleteAgency, initUser, updateAgencyDetails, upsertAgency } from '@/lib/server-actions/queries/agency-queries'
+import { deleteAgency, initUser, updateAgencyDetails, createAgency } from '@/lib/server-actions/queries/agency-queries'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 import { Button } from '@/components/ui/button'
 import { CustomLoader } from '@/components/molecules/loader'
-import { v4 } from 'uuid'
+import { generateObjectId } from '@/lib/utils'
 
 interface IAgencyDetails {
   data?: Partial<Agency>
@@ -102,8 +102,9 @@ function AgencyDetails({ data }: IAgencyDetails) {
       })
 
       if (!data?.customerId) {
-        const response = await upsertAgency({
-          id: data?.id ? data.id : v4(),
+        const objectId = generateObjectId()
+        const response = await createAgency({
+          id: data?.id ? data.id : objectId,
           customerId: data?.customerId || '',
           address: values.address,
           agencyLogo: values.agencyLogo,

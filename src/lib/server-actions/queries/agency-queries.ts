@@ -2,10 +2,11 @@
 
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { Agency, Plan, User } from '@prisma/client'
+import { Agency, Plan, Prisma, User } from '@prisma/client'
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { saveActivityLogsNotification } from './noti-queries'
+import { generateObjectId } from '@/lib/utils'
 
 /** get authed user details */
 export const getAuthUserDetails = async () => {
@@ -122,6 +123,8 @@ export const deleteAgency = async (agencyId: string) => {
 
 /** init user for create new user */
 export const initUser = async (newUser: Partial<User>) => {
+  const id = generateObjectId()
+  Logger.info('initUser id :', id)
   const user = await currentUser()
   if (!user) return
 
@@ -131,7 +134,7 @@ export const initUser = async (newUser: Partial<User>) => {
     },
     update: newUser,
     create: {
-      id: user.id,
+      id: id,
       avatarUrl: user.imageUrl,
       email: user.emailAddresses[0].emailAddress,
       name: `${user.firstName} ${user.lastName}`,
@@ -148,16 +151,13 @@ export const initUser = async (newUser: Partial<User>) => {
   return userData
 }
 
-/** upsert agency */
-export const upsertAgency = async (agency: Agency, price?: Plan) => {
+/** create agency */
+export const createAgency = async (agency: Agency, price?: Plan) => {
+  console.log('agency.id', agency.id)
   if (!agency.companyEmail) return null
   try {
-    const agencyDetails = await db.agency.upsert({
-      where: {
-        id: agency.id,
-      },
-      update: agency,
-      create: {
+    const agencyDetails = await db.agency.create({
+      data: {
         users: { connect: { email: agency.companyEmail } },
         ...agency,
         SidebarOption: {
