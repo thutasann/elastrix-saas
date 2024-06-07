@@ -4,6 +4,17 @@ This is the Web Builder and Project Management SAAS.
 
 ![demo](./public/assets/preview.png)
 
+## Tech Stacks
+
+- Nextjs
+- Clerk
+- Prisma
+- MySql
+- Stripe
+- Shadcn UI
+- Uploadthings
+- Zod
+
 ## Scripts
 
 ### ERD Generator

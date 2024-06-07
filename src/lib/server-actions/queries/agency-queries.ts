@@ -2,7 +2,7 @@
 
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { Agency, User } from '@prisma/client'
+import { Agency, Plan, User } from '@prisma/client'
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { saveActivityLogsNotification } from './noti-queries'
@@ -108,4 +108,96 @@ export const updateAgencyDetails = async (agencyId: string, agencyDetails: Parti
     data: { ...agencyDetails },
   })
   return response
+}
+
+/** delete agency */
+export const deleteAgency = async (agencyId: string) => {
+  const response = await db.agency.delete({
+    where: {
+      id: agencyId,
+    },
+  })
+  return response
+}
+
+/** init user for create new user */
+export const initUser = async (newUser: Partial<User>) => {
+  const user = await currentUser()
+  if (!user) return
+
+  const userData = await db.user.upsert({
+    where: {
+      email: user.emailAddresses[0].emailAddress,
+    },
+    update: newUser,
+    create: {
+      id: user.id,
+      avatarUrl: user.imageUrl,
+      email: user.emailAddresses[0].emailAddress,
+      name: `${user.firstName} ${user.lastName}`,
+      role: newUser.role || 'SUBACCOUNT_USER',
+    },
+  })
+
+  await clerkClient.users.updateUserMetadata(user.id, {
+    privateMetadata: {
+      role: newUser.role || 'SUBACCOUNT_USER',
+    },
+  })
+
+  return userData
+}
+
+/** upsert agency */
+export const upsertAgency = async (agency: Agency, price?: Plan) => {
+  if (!agency.companyEmail) return null
+  try {
+    const agencyDetails = await db.agency.upsert({
+      where: {
+        id: agency.id,
+      },
+      update: agency,
+      create: {
+        users: { connect: { email: agency.companyEmail } },
+        ...agency,
+        SidebarOption: {
+          create: [
+            {
+              name: 'Dashboard',
+              icon: 'category',
+              link: `/agency/${agency.id}`,
+            },
+            {
+              name: 'Launchpad',
+              icon: 'clipboardIcon',
+              link: `/agency/${agency.id}/launchpad`,
+            },
+            {
+              name: 'Billing',
+              icon: 'payment',
+              link: `/agency/${agency.id}/billing`,
+            },
+            {
+              name: 'Settings',
+              icon: 'settings',
+              link: `/agency/${agency.id}/settings`,
+            },
+            {
+              name: 'Sub Accounts',
+              icon: 'person',
+              link: `/agency/${agency.id}/all-subaccounts`,
+            },
+            {
+              name: 'Team',
+              icon: 'shield',
+              link: `/agency/${agency.id}/team`,
+            },
+          ],
+        },
+      },
+    })
+    return agencyDetails
+  } catch (error) {
+    Logger.error('upsert agency error : ', error)
+  }
 }

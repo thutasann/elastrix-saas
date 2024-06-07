@@ -21,15 +21,9 @@ const Navigation = ({ user }: Props) => {
           <Link href={'#pricing'} className='cursor-pointer'>
             Pricing
           </Link>
-          <Link href={'#'} className='cursor-default text-slate-500' scroll>
-            About
-          </Link>
-          <Link href={'#'} className='cursor-default text-slate-500'>
-            Documentation
-          </Link>
-          <Link href={'#'} className='cursor-default text-slate-500'>
-            Features
-          </Link>
+          <span className='cursor-default text-slate-500'>About</span>
+          <span className='cursor-default text-slate-500'>Documentation</span>
+          <span className='cursor-default text-slate-500'>Features</span>
         </ul>
       </nav>
       <aside className='flex items-center gap-2'>

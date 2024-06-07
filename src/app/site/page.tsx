@@ -14,10 +14,10 @@ export default function Home() {
 
         <p className='text-center'>Run your agency, in one place</p>
 
-        <div className='relative mt-0 bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent md:mt-24'>
+        <div className='relative mt-0 bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent md:mt-8'>
           <h1 className='text-center text-7xl font-bold md:text-[230px]'>Elastrix</h1>
         </div>
-        <div className='relative flex items-center justify-center md:mt-[-70px]'>
+        <div className='relative flex items-center justify-center md:mt-[-40px]'>
           <Image
             src={'/assets/preview.png'}
             alt='banner image'

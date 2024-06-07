@@ -1,9 +1,10 @@
 import React from 'react'
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { getAuthUserDetails, verifyAndAcceptInvitation } from '@/lib/server-actions/queries/queries'
+import { getAuthUserDetails, verifyAndAcceptInvitation } from '@/lib/server-actions/queries/agency-queries'
 import { Plan } from '@prisma/client'
 import AgencyDetails from '@/components/organisms/forms/agency-details'
+import { ChevronLeft } from 'lucide-react'
 
 interface IAgencyPage {
   searchParams: {
@@ -35,6 +36,7 @@ async function AgencyPage({ searchParams }: IAgencyPage) {
     }
   }
   const authUser = await currentUser()
+
   return (
     <div className='mt-4 flex items-center justify-center'>
       <div className='max-w-[850px] rounded-xl border-[1px] p-4'>

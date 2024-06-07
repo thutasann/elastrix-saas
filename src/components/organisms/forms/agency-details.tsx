@@ -25,10 +25,11 @@ import FileUpload from '@/components/atoms/file-upload'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { NumberInput } from '@tremor/react'
-import { updateAgencyDetails } from '@/lib/server-actions/queries/queries'
+import { deleteAgency, initUser, updateAgencyDetails, upsertAgency } from '@/lib/server-actions/queries/agency-queries'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 import { Button } from '@/components/ui/button'
 import { CustomLoader } from '@/components/molecules/loader'
+import { v4 } from 'uuid'
 
 interface IAgencyDetails {
   data?: Partial<Agency>
@@ -66,9 +67,97 @@ function AgencyDetails({ data }: IAgencyDetails) {
     }
   }, [data, form])
 
-  const handleSubmit = async () => {}
+  const handleSubmit = async (values: z.infer<typeof AgencyDetailFormSchema>) => {
+    try {
+      let newUserData
+      let custId: string
 
-  const handleDeleteAgency = async () => {}
+      if (!data?.id) {
+        const payloadData = {
+          email: values.companyEmail,
+          name: values.name,
+          shipping: {
+            address: {
+              city: values.city,
+              country: values.country,
+              line1: values.address,
+              postal_code: values.zipCode,
+              state: values.zipCode,
+            },
+            name: values.name,
+          },
+          address: {
+            city: values.city,
+            country: values.country,
+            line1: values.address,
+            postal_code: values.zipCode,
+            state: values.zipCode,
+          },
+        }
+      }
+
+      // init user
+      newUserData = await initUser({
+        role: 'AGENCY_OWNER',
+      })
+
+      if (!data?.customerId) {
+        const response = await upsertAgency({
+          id: data?.id ? data.id : v4(),
+          customerId: data?.customerId || '',
+          address: values.address,
+          agencyLogo: values.agencyLogo,
+          city: values.city,
+          companyPhone: values.companyPhone,
+          country: values.country,
+          name: values.name,
+          state: values.state,
+          whiteLabel: values.whiteLabel,
+          zipCode: values.zipCode,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          companyEmail: values.companyEmail,
+          connectAccountId: '',
+          goal: 5,
+        })
+        toast({
+          title: 'Created Agency',
+        })
+        if (data?.id) return router.refresh()
+        if (response) {
+          return router.refresh()
+        }
+      }
+    } catch (error) {
+      console.log('create agency error: ', error)
+      toast({
+        variant: 'destructive',
+        title: 'Oppse!',
+        description: 'could not create your agency',
+      })
+    }
+  }
+
+  const handleDeleteAgency = async () => {
+    if (!data?.id) return
+    setDeletingAgency(true)
+    try {
+      const response = await deleteAgency(data.id)
+      toast({
+        title: 'Deleted agency',
+        description: 'Deleted your agency and all subaccounts',
+      })
+      router.refresh()
+    } catch (error) {
+      console.error('agency delete error : ', error)
+      toast({
+        title: 'Opps!',
+        description: 'Could not delete your agency',
+        variant: 'destructive',
+      })
+    }
+    setDeletingAgency(false)
+  }
 
   return (
     <AlertDialog>
