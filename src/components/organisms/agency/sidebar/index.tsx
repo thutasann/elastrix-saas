@@ -1,5 +1,6 @@
 import React from 'react'
 import { getAuthUserDetails } from '@/lib/server-actions/queries/agency-queries'
+import MenuOptions from './menu-options'
 
 interface ISidebar {
   id: string
@@ -39,7 +40,27 @@ async function Sidebar({ id, type }: ISidebar) {
     user.Permissions.find((permission) => permission.subAccountId === sub.id && permission.access),
   )
 
-  return <div></div>
+  return (
+    <>
+      <MenuOptions
+        defaultOpen={true}
+        details={details}
+        id={id}
+        sidebarLogo={sideBarLogo}
+        sidebarOpt={sidebarOptions}
+        subAccounts={subaccounts}
+        user={user}
+      />
+      <MenuOptions
+        details={details}
+        id={id}
+        sidebarLogo={sideBarLogo}
+        sidebarOpt={sidebarOptions}
+        subAccounts={subaccounts}
+        user={user}
+      />
+    </>
+  )
 }
 
 export default Sidebar

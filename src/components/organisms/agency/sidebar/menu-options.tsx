@@ -1,5 +1,11 @@
+'use client'
+
+import { useModal } from '@/providers/modal-provider'
 import { AgencySidebarOption, SubAccount, SubAccountSidebarOption } from '@prisma/client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { Popover, PopoverContent, PopoverTrigger } from '../../../ui/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../../ui/command'
+import { Sheet } from '@/components/ui/sheet'
 
 interface IMenuOptions {
   defaultOpen?: boolean
@@ -12,7 +18,16 @@ interface IMenuOptions {
 }
 
 function MenuOptions({ defaultOpen, subAccounts, sidebarOpt, sidebarLogo, details, user, id }: IMenuOptions) {
-  return <div>MenuOptions</div>
+  const { setOpen } = useModal()
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) return
+
+  return <Sheet modal={false}></Sheet>
 }
 
 export default MenuOptions

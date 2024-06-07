@@ -98,3 +98,21 @@ export const saveActivityLogsNotification = async ({
     })
   }
 }
+
+/**
+ * get notification and user info
+ */
+export const getnotificationAnduser = async (agencyId: string) => {
+  try {
+    const response = await db.notification.findMany({
+      where: { agencyId },
+      include: { User: true },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+    return response
+  } catch (error) {
+    Logger.error('get noti and user info error : ', error)
+  }
+}

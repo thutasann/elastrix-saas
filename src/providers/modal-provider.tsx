@@ -83,7 +83,7 @@ const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 }
 
 /** useModal hook */
-export const useMoal = (): ModalContextType => {
+export const useModal = (): ModalContextType => {
   const context = useContext(ModalContext)
   if (!context) {
     throw new Error('useModal must be used withing the modal provider')
