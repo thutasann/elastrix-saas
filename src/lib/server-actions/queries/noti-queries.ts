@@ -1,3 +1,5 @@
+'use server'
+
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { currentUser } from '@clerk/nextjs/server'
