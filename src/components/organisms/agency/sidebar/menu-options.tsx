@@ -1,7 +1,7 @@
 'use client'
 
 import { useModal } from '@/providers/modal-provider'
-import { AgencySidebarOption, SubAccount, SubAccountSidebarOption } from '@prisma/client'
+import { Agency, AgencySidebarOption, SubAccount, SubAccountSidebarOption } from '@prisma/client'
 import React, { useEffect, useMemo, useState } from 'react'
 import { Popover, PopoverContent, PopoverTrigger } from '../../../ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '../../../ui/command'
@@ -12,8 +12,9 @@ import { AspectRatio } from '@/components/ui/aspect-ratio'
 import Image from 'next/image'
 import clsx from 'clsx'
 import Link from 'next/link'
-import { Separator } from '@/components/ui/separator'
 import { icons } from '@/lib/constants'
+import CustomModal from '@/components/molecules/modals/cutsom-modal'
+import SubAccountDetailsForm from '../../forms/subaccount-details'
 
 interface IMenuOptions {
   defaultOpen?: boolean
@@ -159,7 +160,23 @@ function MenuOptions({ defaultOpen, subAccounts, sidebarOpt, sidebarLogo, detail
                 </CommandList>
                 {(user?.role === 'AGENCY_OWNER' || user?.role === 'AGENCY_ADMIN') && (
                   <SheetClose>
-                    <Button className='flex w-full gap-2'>
+                    <Button
+                      className='felx gpa-2 w-full'
+                      onClick={() => {
+                        setOpen(
+                          <CustomModal
+                            title='Create a subaccount'
+                            subheading='You can switch between your agency account and the subaccount from the sidebar'
+                          >
+                            <SubAccountDetailsForm
+                              agencyDetails={user?.Agency as Agency}
+                              userId={user?.id as string}
+                              userName={user?.name}
+                            />
+                          </CustomModal>,
+                        )
+                      }}
+                    >
                       <PlusCircleIcon size={15} />
                       Create Sub Account
                     </Button>
@@ -177,10 +194,10 @@ function MenuOptions({ defaultOpen, subAccounts, sidebarOpt, sidebarLogo, detail
                 <CommandEmpty>No Results Found</CommandEmpty>
                 <CommandGroup className='overflow-visible'>
                   {sidebarOpt.map((sidebarOptions) => {
-                    let val
+                    let icon
                     const result = icons.find((icon) => icon.value === sidebarOptions.icon)
                     if (result) {
-                      val = <result.path />
+                      icon = <result.path />
                     }
                     return (
                       <CommandItem key={sidebarOptions.id} className='my-2 w-full py-2.5 md:w-[320px]'>
@@ -188,7 +205,7 @@ function MenuOptions({ defaultOpen, subAccounts, sidebarOpt, sidebarLogo, detail
                           href={sidebarOptions.link}
                           className='flex w-[320px] items-center gap-2 rounded-md transition-all hover:bg-transparent md:w-full'
                         >
-                          {val}
+                          {icon}
                           <span>{sidebarOptions.name}</span>
                         </Link>
                       </CommandItem>

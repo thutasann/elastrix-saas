@@ -1,5 +1,8 @@
 import * as z from 'zod'
 
+/**
+ * Agency Detail Form Schema
+ */
 export const AgencyDetailFormSchema = z.object({
   name: z.string().min(2, { message: 'Agency name must be atleast 2 chars.' }),
   companyEmail: z.string().min(1),
@@ -11,4 +14,19 @@ export const AgencyDetailFormSchema = z.object({
   state: z.string().min(1),
   country: z.string().min(1),
   agencyLogo: z.string().min(1),
+})
+
+/**
+ * SubAccount Detail Form Schema
+ */
+export const SubAccountFormSchema = z.object({
+  name: z.string(),
+  companyEmail: z.string(),
+  companyPhone: z.string().min(1),
+  address: z.string(),
+  city: z.string(),
+  subAccountLogo: z.string(),
+  zipCode: z.string(),
+  state: z.string(),
+  country: z.string(),
 })

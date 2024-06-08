@@ -23,9 +23,13 @@ export type ModalDataProps = {
 
 /** Modal context type */
 type ModalContextType = {
+  /** modal data */
   data: ModalDataProps
+  /** checking modal is opened or not */
   isOpen: boolean
+  /** open fn */
   setOpen: (modal: React.ReactNode, fetchData?: () => Promise<any>) => void
+  /** close fn */
   setClose: () => void
 }
 

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
-import { AgencyDetailFormSchema } from '@/dto/forms/agency-details-form'
+import { AgencyDetailFormSchema } from '@/dto/forms/agency-forms'
 import { Agency } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
