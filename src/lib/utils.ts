@@ -19,9 +19,9 @@ export function generateObjectId() {
   const timestamp = Math.floor(Date.now() / 1000)
     .toString(16)
     .padStart(8, '0')
-  const machineIdentifier = generateRandomHex(6) // 3 bytes
-  const processIdentifier = generateRandomHex(4) // 2 bytes
-  const counter = generateRandomHex(6) // 3 bytes
+  const machineIdentifier = generateRandomHex(6)
+  const processIdentifier = generateRandomHex(4)
+  const counter = generateRandomHex(6)
 
   return timestamp + machineIdentifier + processIdentifier + counter
 }

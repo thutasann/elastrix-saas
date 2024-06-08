@@ -15,6 +15,9 @@ import { Input } from '@/components/ui/input'
 import FileUpload from '@/components/atoms/file-upload'
 import { Button } from '@/components/ui/button'
 import { CustomLoader } from '@/components/molecules/loader'
+import { createSubAccount } from '@/lib/server-actions/queries/subaccount-queries'
+import { generateObjectId } from '@/lib/utils'
+import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 
 interface ISubAccountDetailsForm {
   agencyDetails: Agency
@@ -50,6 +53,37 @@ function SubAccountDetailsForm({ details, agencyDetails, userId, userName }: ISu
 
   const onSubmit = async (values: z.infer<typeof SubAccountFormSchema>) => {
     try {
+      const response = await createSubAccount({
+        id: details?.id ? details.id : generateObjectId(),
+        address: values.address,
+        subAccountLogo: values.subAccountLogo,
+        city: values.city,
+        companyPhone: values.companyPhone,
+        country: values.country,
+        name: values.name,
+        state: values.state,
+        zipCode: values.zipCode,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        companyEmail: values.companyEmail,
+        agencyId: agencyDetails.id,
+        connectAccountId: '',
+        goal: 5000,
+      })
+      if (!response) throw new Error('No response from server')
+      await saveActivityLogsNotification({
+        agencyId: response.agencyId,
+        description: `${userName} | updated sub account | ${response.name}`,
+        subAccountId: response.id,
+      })
+
+      toast({
+        title: 'Subaccount details saved',
+        description: 'Successfully saved your subaccount details.',
+      })
+
+      setClose()
+      router.refresh()
     } catch (error) {
       console.log('sub account save error: ', error)
       toast({
