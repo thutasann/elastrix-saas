@@ -1,10 +1,11 @@
 import React from 'react'
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { getAuthUserDetails, verifyAndAcceptInvitation } from '@/lib/server-actions/queries/agency-queries'
+import { verifyAndAcceptInvitation } from '@/lib/server-actions/queries/agency-queries'
 import { Plan } from '@prisma/client'
 import AgencyDetails from '@/components/organisms/forms/agency-details'
 import { ChevronLeft } from 'lucide-react'
+import { getAuthUserDetails } from '@/lib/server-actions/queries/subaccount-queries'
 
 interface IAgencyPage {
   searchParams: {

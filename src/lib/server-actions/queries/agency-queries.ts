@@ -2,39 +2,11 @@
 
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { Agency, Plan, Prisma, User } from '@prisma/client'
+import { Agency, Plan, User } from '@prisma/client'
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { saveActivityLogsNotification } from './noti-queries'
 import { generateObjectId, getSideBarOptions } from '@/lib/utils'
-
-/** get authed user details */
-export const getAuthUserDetails = async () => {
-  const user = await currentUser()
-  Logger.info('fullName', user?.fullName)
-  if (!user) return
-
-  const userData = await db.user.findUnique({
-    where: {
-      email: user.emailAddresses[0].emailAddress,
-    },
-    include: {
-      Agency: {
-        include: {
-          SidebarOption: true,
-          SubAccount: {
-            include: {
-              SidebarOption: true,
-            },
-          },
-        },
-      },
-      Permissions: true,
-    },
-  })
-
-  return userData
-}
 
 /** verify and accept invitation */
 export const verifyAndAcceptInvitation = async (): Promise<string | null> => {
@@ -192,6 +164,6 @@ export const upsertAgency = async (agency: Agency, id?: string, price?: Plan) =>
     })
     return agencyDetails
   } catch (error) {
-    console.log('upsert agency error ', error)
+    Logger.error('upsert agency error ', error)
   }
 }

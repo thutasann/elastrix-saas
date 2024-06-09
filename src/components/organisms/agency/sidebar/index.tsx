@@ -1,5 +1,5 @@
 import React from 'react'
-import { getAuthUserDetails } from '@/lib/server-actions/queries/agency-queries'
+import { getAuthUserDetails } from '@/lib/server-actions/queries/subaccount-queries'
 import MenuOptions from './menu-options'
 
 interface ISidebar {

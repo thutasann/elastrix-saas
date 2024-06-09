@@ -1,4 +1,5 @@
 import AgencyDetails from '@/components/organisms/forms/agency-details'
+import UserDetailsForm from '@/components/organisms/forms/user-details'
 import { db } from '@/lib/db'
 import { currentUser } from '@clerk/nextjs/server'
 import React from 'react'
@@ -35,6 +36,7 @@ async function SettingsPage({ params }: ISettingsPage) {
   return (
     <div className='flex flex-col gap-4 lg:flex-row'>
       <AgencyDetails data={agencyDetails} update />
+      <UserDetailsForm type='agency' id={params.agencyId} subAccounts={subAccounts} userData={userDetails} />
     </div>
   )
 }

@@ -3,7 +3,8 @@
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { generateObjectId } from '@/lib/utils'
-import { SubAccount } from '@prisma/client'
+import { Role, SubAccount, User } from '@prisma/client'
+import { clerkClient, currentUser } from '@clerk/nextjs/server'
 
 /** create sub account */
 export const createSubAccount = async (subAccount: SubAccount) => {
@@ -83,4 +84,92 @@ export const createSubAccount = async (subAccount: SubAccount) => {
     },
   })
   return response
+}
+
+/** get authed user details */
+export const getAuthUserDetails = async () => {
+  const user = await currentUser()
+  Logger.info('getAuthUserDetails() fullName', user?.fullName)
+  if (!user) return
+
+  const userData = await db.user.findUnique({
+    where: {
+      email: user.emailAddresses[0].emailAddress,
+    },
+    include: {
+      Agency: {
+        include: {
+          SidebarOption: true,
+          SubAccount: {
+            include: {
+              SidebarOption: true,
+            },
+          },
+        },
+      },
+      Permissions: true,
+    },
+  })
+
+  return userData
+}
+
+/** get user permissions */
+export const getUserPermissions = async (userId: string) => {
+  const response = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      Permissions: {
+        include: {
+          SubAccount: true,
+        },
+      },
+    },
+  })
+  return response
+}
+
+/** update user */
+export const updateUser = async (user: Partial<User>) => {
+  const response = await db.user.update({
+    where: { email: user.email },
+    data: { ...user },
+  })
+
+  try {
+    await clerkClient.users.updateUserMetadata(response.id, {
+      privateMetadata: {
+        role: user.role || 'SUBACCOUNT_USER',
+      },
+    })
+  } catch (error) {
+    console.log('error', error)
+  }
+
+  return response
+}
+
+/** change user permission */
+export const changeUserPermissions = async (
+  permissionId: string | undefined,
+  userEmail: string,
+  subAccountId: string,
+  permission: boolean,
+) => {
+  try {
+    const response = await db.permissions.upsert({
+      where: { id: permissionId },
+      update: { access: permission },
+      create: {
+        access: permission,
+        email: userEmail,
+        subAccountId: subAccountId,
+      },
+    })
+    return response
+  } catch (error) {
+    Logger.error('could not change permission : ', error)
+  }
 }

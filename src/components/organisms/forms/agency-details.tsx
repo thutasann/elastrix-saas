@@ -39,6 +39,7 @@ import { generateObjectId } from '@/lib/utils'
 
 interface IAgencyDetails {
   data?: Partial<Agency>
+  /** check form is create form or edit form  */
   update?: boolean
 }
 
