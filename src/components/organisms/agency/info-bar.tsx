@@ -3,7 +3,6 @@
 import { NotificationWithUser } from '@/dto/types/agency'
 import React, { useState } from 'react'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '../../ui/sheet'
-import { twMerge } from 'tailwind-merge'
 import { UserButton } from '@clerk/nextjs'
 import { Bell } from 'lucide-react'
 import { Role } from '@prisma/client'
@@ -11,6 +10,7 @@ import { Card } from '../../ui/card'
 import { Switch } from '../../ui/switch'
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
 import { ModeToggle } from '@/components/atoms/mode-toggle'
+import { cn } from '@/lib/utils'
 
 interface IInfoBar {
   notifications: NotificationWithUser | []
@@ -37,7 +37,7 @@ function InfoBar({ notifications, role, className, subAccountId }: IInfoBar) {
   return (
     <>
       <div
-        className={twMerge(
+        className={cn(
           'fixed left-0 right-0 top-0 z-[20] flex items-center gap-4 border-b-[1px] p-4 backdrop-blur-md md:left-[300px]',
           className,
         )}

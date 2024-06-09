@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
-import { generateObjectId } from '@/lib/utils'
+import { generateObjectId, getSideBarOptionsForSubAccount } from '@/lib/utils'
 import { Role, SubAccount, User } from '@prisma/client'
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 
@@ -38,48 +38,49 @@ export const createSubAccount = async (subAccount: SubAccount) => {
         create: { name: 'Fitness Agency' },
       },
       SidebarOption: {
-        create: [
-          {
-            name: 'Launchpad',
-            icon: 'clipboardIcon',
-            link: `/subaccount/${subAccount.id}/launchpad`,
-          },
-          {
-            name: 'Settings',
-            icon: 'settings',
-            link: `/subaccount/${subAccount.id}/settings`,
-          },
-          {
-            name: 'Funnels',
-            icon: 'pipelines',
-            link: `/subaccount/${subAccount.id}/funnels`,
-          },
-          {
-            name: 'Media',
-            icon: 'database',
-            link: `/subaccount/${subAccount.id}/media`,
-          },
-          {
-            name: 'Automations',
-            icon: 'chip',
-            link: `/subaccount/${subAccount.id}/automations`,
-          },
-          {
-            name: 'Pipelines',
-            icon: 'flag',
-            link: `/subaccount/${subAccount.id}/pipelines`,
-          },
-          {
-            name: 'Contacts',
-            icon: 'person',
-            link: `/subaccount/${subAccount.id}/contacts`,
-          },
-          {
-            name: 'Dashboard',
-            icon: 'category',
-            link: `/subaccount/${subAccount.id}`,
-          },
-        ],
+        create: getSideBarOptionsForSubAccount(subAccount),
+      },
+    },
+  })
+  return response
+}
+
+/** upsert sub account */
+export const upsertSubAccount = async (subAccount: SubAccount, id: string) => {
+  if (!subAccount.companyEmail) return null
+
+  const agencyOwner = await db.user.findFirst({
+    where: {
+      Agency: {
+        id: subAccount.agencyId,
+      },
+      role: 'AGENCY_OWNER',
+    },
+  })
+
+  if (!agencyOwner) return console.log('🔴Erorr could not create subaccount')
+  const permissionId = generateObjectId()
+  const response = await db.subAccount.upsert({
+    where: { id: id },
+    update: subAccount,
+    create: {
+      ...subAccount,
+      Permissions: {
+        create: {
+          access: true,
+          email: agencyOwner.email,
+          id: permissionId,
+        },
+        connect: {
+          subAccountId: subAccount.id,
+          id: permissionId,
+        },
+      },
+      Pipeline: {
+        create: { name: 'Lead Cycle' },
+      },
+      SidebarOption: {
+        create: getSideBarOptionsForSubAccount(subAccount),
       },
     },
   })
@@ -172,4 +173,24 @@ export const changeUserPermissions = async (
   } catch (error) {
     Logger.error('could not change permission : ', error)
   }
+}
+
+/** get sub account details */
+export const getSubaccountDetails = async (subaccountId: string) => {
+  const response = await db.subAccount.findUnique({
+    where: {
+      id: subaccountId,
+    },
+  })
+  return response
+}
+
+/** delete sub account */
+export const deleteSubAccount = async (subaccountId: string) => {
+  const response = await db.subAccount.delete({
+    where: {
+      id: subaccountId,
+    },
+  })
+  return response
 }

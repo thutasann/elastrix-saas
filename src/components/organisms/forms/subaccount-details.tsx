@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import FileUpload from '@/components/atoms/file-upload'
 import { Button } from '@/components/ui/button'
 import { CustomLoader } from '@/components/molecules/loader'
-import { createSubAccount } from '@/lib/server-actions/queries/subaccount-queries'
+import { createSubAccount, upsertSubAccount } from '@/lib/server-actions/queries/subaccount-queries'
 import { generateObjectId } from '@/lib/utils'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 
@@ -24,9 +24,10 @@ interface ISubAccountDetailsForm {
   details?: Partial<SubAccount>
   userId: string
   userName: string
+  update?: boolean
 }
 
-function SubAccountDetailsForm({ details, agencyDetails, userId, userName }: ISubAccountDetailsForm) {
+function SubAccountDetailsForm({ details, agencyDetails, userId, userName, update }: ISubAccountDetailsForm) {
   const { toast } = useToast()
   const { setClose } = useModal()
   const router = useRouter()
@@ -52,25 +53,52 @@ function SubAccountDetailsForm({ details, agencyDetails, userId, userName }: ISu
   }, [details, form])
 
   const onSubmit = async (values: z.infer<typeof SubAccountFormSchema>) => {
+    let response
+
+    const payload = update
+      ? ({
+          address: values.address,
+          subAccountLogo: values.subAccountLogo,
+          city: values.city,
+          companyPhone: values.companyPhone,
+          country: values.country,
+          name: values.name,
+          state: values.state,
+          zipCode: values.zipCode,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          companyEmail: values.companyEmail,
+          agencyId: agencyDetails.id,
+          connectAccountId: '',
+          goal: 5000,
+        } as SubAccount)
+      : ({
+          id: details?.id ? details.id : generateObjectId(),
+          address: values.address,
+          subAccountLogo: values.subAccountLogo,
+          city: values.city,
+          companyPhone: values.companyPhone,
+          country: values.country,
+          name: values.name,
+          state: values.state,
+          zipCode: values.zipCode,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          companyEmail: values.companyEmail,
+          agencyId: agencyDetails.id,
+          connectAccountId: '',
+          goal: 5000,
+        } as SubAccount)
+
     try {
-      const response = await createSubAccount({
-        id: details?.id ? details.id : generateObjectId(),
-        address: values.address,
-        subAccountLogo: values.subAccountLogo,
-        city: values.city,
-        companyPhone: values.companyPhone,
-        country: values.country,
-        name: values.name,
-        state: values.state,
-        zipCode: values.zipCode,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        companyEmail: values.companyEmail,
-        agencyId: agencyDetails.id,
-        connectAccountId: '',
-        goal: 5000,
-      })
+      if (update) {
+        response = await upsertSubAccount(payload, details?.id!)
+      } else {
+        response = await createSubAccount(payload)
+      }
+
       if (!response) throw new Error('No response from server')
+
       await saveActivityLogsNotification({
         agencyId: response.agencyId,
         description: `${userName} | updated sub account | ${response.name}`,
