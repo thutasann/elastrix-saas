@@ -63,7 +63,7 @@ function InfoBar({ notifications, role, className, subAccountId }: IInfoBar) {
                 </SheetDescription>
               </SheetHeader>
               {allNotifications?.map((notification) => (
-                <div key={notification.id} className='mb-2 flex flex-col gap-y-2 overflow-x-scroll text-ellipsis'>
+                <div key={notification.id} className='mb-2 flex flex-col gap-y-2 overflow-x-auto text-ellipsis py-2'>
                   <div className='flex gap-2'>
                     <Avatar>
                       <AvatarImage src={notification.User.avatarUrl} alt='Profile Picture' />

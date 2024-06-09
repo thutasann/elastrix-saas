@@ -1,4 +1,7 @@
-import { getAuthUserDetails } from '@/lib/server-actions/queries/subaccount-queries'
+import {
+  getAuthUserDetails,
+  getUsersWithAgencySubAccountPermissionsSidebarOptions,
+} from '@/lib/server-actions/queries/subaccount-queries'
 import { getUserPermissions } from '@/lib/server-actions/queries/subaccount-queries'
 import { _getTicketsWithAllRelations } from '@/lib/server-actions/queries/ticket-queries'
 import { Notification, Prisma, Role } from '@prisma/client'
@@ -31,3 +34,8 @@ export type UserWithPermissionsAndSubAccounts = Prisma.PromiseReturnType<typeof 
 
 /**  Auth User with Agency Sidebar Options and SubAccounts Props */
 export type AuthUserWithAgencySidebarOptionsAndSubAccounts = Prisma.PromiseReturnType<typeof getAuthUserDetails>
+
+/** Users with Agency SubAccount Permissions and Sidebar Options Props */
+export type UsersWithAgencySubAccountPermissionsSidebarOptions = Prisma.PromiseReturnType<
+  typeof getUsersWithAgencySubAccountPermissionsSidebarOptions
+>

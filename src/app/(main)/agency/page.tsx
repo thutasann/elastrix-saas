@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation'
 import { verifyAndAcceptInvitation } from '@/lib/server-actions/queries/agency-queries'
 import { Plan } from '@prisma/client'
 import AgencyDetails from '@/components/organisms/forms/agency-details'
-import { ChevronLeft } from 'lucide-react'
 import { getAuthUserDetails } from '@/lib/server-actions/queries/subaccount-queries'
 
 interface IAgencyPage {
@@ -27,8 +26,8 @@ async function AgencyPage({ searchParams }: IAgencyPage) {
         return redirect(`/agency/${agencyId}/billing?plan=${searchParams.plan}`)
       }
       if (searchParams.state) {
-        const statePath = searchParams.state.split('__')[0]
-        const stateAgencyId = searchParams.state.split('__')[1]
+        const statePath = searchParams.state.split('___')[0]
+        const stateAgencyId = searchParams.state.split('___')[1]
         if (!stateAgencyId) return <div>Not Authorized</div>
         return redirect(`/agency/${stateAgencyId}/${statePath}?code=${searchParams.code}`)
       } else return redirect(`/agency/${agencyId}`)

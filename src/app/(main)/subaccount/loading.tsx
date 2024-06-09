@@ -1,7 +1,7 @@
 import React from 'react'
 import { CustomLoader } from '@/components/molecules/loader'
 
-function AgencyLoadingPage() {
+function SubAccountLoading() {
   return (
     <div className='flex h-[100vh] w-full items-center justify-center'>
       <CustomLoader className='h-8 w-8' />
@@ -9,4 +9,4 @@ function AgencyLoadingPage() {
   )
 }
 
-export default AgencyLoadingPage
+export default SubAccountLoading

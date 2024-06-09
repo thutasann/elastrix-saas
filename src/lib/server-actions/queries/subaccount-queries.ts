@@ -3,7 +3,7 @@
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { generateObjectId, getSideBarOptionsForSubAccount } from '@/lib/utils'
-import { Role, SubAccount, User } from '@prisma/client'
+import { SubAccount, User } from '@prisma/client'
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 
 /** create sub account */
@@ -193,4 +193,70 @@ export const deleteSubAccount = async (subaccountId: string) => {
     },
   })
   return response
+}
+
+/** get team members */
+export const getTeamMembers = async (agencyId: string) => {
+  const response = await db.user.findMany({
+    where: {
+      Agency: {
+        id: agencyId,
+      },
+    },
+    include: {
+      Agency: { include: { SubAccount: true } },
+      Permissions: { include: { SubAccount: true } },
+    },
+  })
+  return response
+}
+
+/** get users with agency subaccount permissions and sidebar options */
+export const getUsersWithAgencySubAccountPermissionsSidebarOptions = async (agencyId: string) => {
+  const response = await db.user.findFirst({
+    where: {
+      Agency: { id: agencyId },
+    },
+    include: {
+      Agency: {
+        include: { SubAccount: true },
+      },
+      Permissions: {
+        include: {
+          SubAccount: true,
+        },
+      },
+    },
+  })
+  return response
+}
+
+/** get user detail with id */
+export const getUser = async (id: string) => {
+  const user = await db.user.findUnique({
+    where: {
+      id,
+    },
+  })
+  return user
+}
+
+/** delete user */
+export const deleteUser = async (userId: string) => {
+  try {
+    await clerkClient.users.updateUserMetadata(userId, {
+      privateMetadata: {
+        role: undefined,
+      },
+    })
+  } catch (error) {
+    Logger.error('clerk update metadata error ', error)
+  }
+
+  const deletedUser = await db.user.delete({
+    where: {
+      id: userId,
+    },
+  })
+  return deletedUser
 }
