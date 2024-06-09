@@ -6,7 +6,7 @@ import { Agency, Plan, Prisma, User } from '@prisma/client'
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { saveActivityLogsNotification } from './noti-queries'
-import { generateObjectId } from '@/lib/utils'
+import { generateObjectId, getSideBarOptions } from '@/lib/utils'
 
 /** get authed user details */
 export const getAuthUserDetails = async () => {
@@ -153,7 +153,7 @@ export const initUser = async (newUser: Partial<User>) => {
 
 /** create agency */
 export const createAgency = async (agency: Agency, price?: Plan) => {
-  console.log('agency.id', agency.id)
+  Logger.info('create agency: ', agency.name)
   if (!agency.companyEmail) return null
   try {
     const agencyDetails = await db.agency.create({
@@ -161,43 +161,37 @@ export const createAgency = async (agency: Agency, price?: Plan) => {
         users: { connect: { email: agency.companyEmail } },
         ...agency,
         SidebarOption: {
-          create: [
-            {
-              name: 'Dashboard',
-              icon: 'category',
-              link: `/agency/${agency.id}`,
-            },
-            {
-              name: 'Launchpad',
-              icon: 'clipboardIcon',
-              link: `/agency/${agency.id}/launchpad`,
-            },
-            {
-              name: 'Billing',
-              icon: 'payment',
-              link: `/agency/${agency.id}/billing`,
-            },
-            {
-              name: 'Settings',
-              icon: 'settings',
-              link: `/agency/${agency.id}/settings`,
-            },
-            {
-              name: 'Sub Accounts',
-              icon: 'person',
-              link: `/agency/${agency.id}/all-subaccounts`,
-            },
-            {
-              name: 'Team',
-              icon: 'shield',
-              link: `/agency/${agency.id}/team`,
-            },
-          ],
+          create: getSideBarOptions(agency),
         },
       },
     })
     return agencyDetails
   } catch (error) {
-    Logger.error('upsert agency error : ', error)
+    Logger.error('create agency error : ', error)
+  }
+}
+
+/** update agency */
+export const upsertAgency = async (agency: Agency, price?: Plan) => {
+  if (!agency.companyEmail) return null
+  try {
+    const agencyDetails = await db.agency.upsert({
+      where: {
+        id: agency.id,
+      },
+      update: agency,
+      create: {
+        users: {
+          connect: { email: agency.companyEmail },
+        },
+        ...agency,
+        SidebarOption: {
+          create: getSideBarOptions(agency),
+        },
+      },
+    })
+    return agencyDetails
+  } catch (error) {
+    console.log(error)
   }
 }

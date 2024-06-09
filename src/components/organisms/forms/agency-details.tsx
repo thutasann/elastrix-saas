@@ -25,7 +25,13 @@ import FileUpload from '@/components/atoms/file-upload'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { NumberInput } from '@tremor/react'
-import { deleteAgency, initUser, updateAgencyDetails, createAgency } from '@/lib/server-actions/queries/agency-queries'
+import {
+  deleteAgency,
+  initUser,
+  updateAgencyDetails,
+  createAgency,
+  upsertAgency,
+} from '@/lib/server-actions/queries/agency-queries'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 import { Button } from '@/components/ui/button'
 import { CustomLoader } from '@/components/molecules/loader'
@@ -33,12 +39,13 @@ import { generateObjectId } from '@/lib/utils'
 
 interface IAgencyDetails {
   data?: Partial<Agency>
+  update?: boolean
 }
 
 /**
  * Agency Details Form
  */
-function AgencyDetails({ data }: IAgencyDetails) {
+function AgencyDetails({ data, update }: IAgencyDetails) {
   const { toast } = useToast()
   const router = useRouter()
   const [deletingAgency, setDeletingAgency] = useState(false)
@@ -70,7 +77,7 @@ function AgencyDetails({ data }: IAgencyDetails) {
   const handleSubmit = async (values: z.infer<typeof AgencyDetailFormSchema>) => {
     try {
       let newUserData
-      let custId: string
+      let custId: string = ''
 
       if (!data?.id) {
         const payloadData = {
@@ -102,10 +109,10 @@ function AgencyDetails({ data }: IAgencyDetails) {
       })
 
       if (!data?.customerId) {
-        const objectId = generateObjectId()
-        const response = await createAgency({
-          id: data?.id ? data.id : objectId,
-          customerId: data?.customerId || '',
+        let response
+        const payload = {
+          id: data?.id ? data.id : generateObjectId(),
+          customerId: data?.customerId || custId || '',
           address: values.address,
           agencyLogo: values.agencyLogo,
           city: values.city,
@@ -120,11 +127,23 @@ function AgencyDetails({ data }: IAgencyDetails) {
           companyEmail: values.companyEmail,
           connectAccountId: '',
           goal: 5,
-        })
+        }
+
+        if (update) {
+          response = await upsertAgency(payload)
+        } else {
+          response = await createAgency(payload)
+        }
+
+        console.log('response', response)
+
         toast({
-          title: 'Created Agency',
+          variant: response ? 'default' : 'destructive',
+          title: !response ? "Can't save agency info" : 'Saved Agency',
         })
+
         if (data?.id) return router.refresh()
+
         if (response) {
           return router.refresh()
         }

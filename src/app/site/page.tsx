@@ -12,9 +12,7 @@ export default function Home() {
       <section className='relative mt-[-70px] flex h-full w-full flex-col items-center justify-center md:pt-44'>
         <div className='absolute bottom-0 left-0 right-0 top-0 -z-10 bg-[linear-gradient(to_right,#161616_1px,transparent_1px),linear-gradient(to_bottom,#161616_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_110%)]' />
 
-        <p className='text-center'>Run your agency, in one place</p>
-
-        <div className='relative mt-0 bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent md:mt-8'>
+        <div className='relative mt-4 bg-gradient-to-r from-primary to-secondary-foreground bg-clip-text text-transparent md:mt-[200px]'>
           <h1 className='text-center text-7xl font-bold md:text-[230px]'>Elastrix</h1>
         </div>
         <div className='relative flex items-center justify-center md:mt-[-40px]'>
@@ -29,11 +27,10 @@ export default function Home() {
         </div>
       </section>
       <section id='pricing' className='mt-[-20px] flex flex-col items-center justify-center gap-4 md:!mt-40'>
-        <h2 className='text-center text-4xl'> Choose what fits you right</h2>
-        <p className='text-center text-muted-foreground'>
+        <h2 className='text-center text-2xl'> Choose what fits you right</h2>
+        <p className='text-center text-sm text-muted-foreground'>
           Our straightforward pricing plans are tailored to meet your needs. If
-          {" you're"} not <br />
-          ready to commit you can get started for free.
+          {" you're"} not ready to commit you can get started for free.
         </p>
         <div className='my-6 flex flex-wrap justify-center gap-4'>
           {pricingCards.map((card) => (

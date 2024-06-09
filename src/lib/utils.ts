@@ -1,3 +1,4 @@
+import { Agency } from '@prisma/client'
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
@@ -24,4 +25,39 @@ export function generateObjectId() {
   const counter = generateRandomHex(6)
 
   return timestamp + machineIdentifier + processIdentifier + counter
+}
+
+export function getSideBarOptions(agency: Agency) {
+  return [
+    {
+      name: 'Dashboard',
+      icon: 'category',
+      link: `/agency/${agency.id}`,
+    },
+    {
+      name: 'Launchpad',
+      icon: 'clipboardIcon',
+      link: `/agency/${agency.id}/launchpad`,
+    },
+    {
+      name: 'Billing',
+      icon: 'payment',
+      link: `/agency/${agency.id}/billing`,
+    },
+    {
+      name: 'Settings',
+      icon: 'settings',
+      link: `/agency/${agency.id}/settings`,
+    },
+    {
+      name: 'Sub Accounts',
+      icon: 'person',
+      link: `/agency/${agency.id}/all-subaccounts`,
+    },
+    {
+      name: 'Team',
+      icon: 'shield',
+      link: `/agency/${agency.id}/team`,
+    },
+  ]
 }
