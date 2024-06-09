@@ -172,12 +172,12 @@ export const createAgency = async (agency: Agency, price?: Plan) => {
 }
 
 /** update agency */
-export const upsertAgency = async (agency: Agency, price?: Plan) => {
+export const upsertAgency = async (agency: Agency, id?: string, price?: Plan) => {
   if (!agency.companyEmail) return null
   try {
     const agencyDetails = await db.agency.upsert({
       where: {
-        id: agency.id,
+        id: id,
       },
       update: agency,
       create: {
@@ -192,6 +192,6 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
     })
     return agencyDetails
   } catch (error) {
-    console.log(error)
+    console.log('upsert agency error ', error)
   }
 }

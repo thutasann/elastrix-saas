@@ -110,27 +110,45 @@ function AgencyDetails({ data, update }: IAgencyDetails) {
 
       if (!data?.customerId) {
         let response
-        const payload = {
-          id: data?.id ? data.id : generateObjectId(),
-          customerId: data?.customerId || custId || '',
-          address: values.address,
-          agencyLogo: values.agencyLogo,
-          city: values.city,
-          companyPhone: values.companyPhone,
-          country: values.country,
-          name: values.name,
-          state: values.state,
-          whiteLabel: values.whiteLabel,
-          zipCode: values.zipCode,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          companyEmail: values.companyEmail,
-          connectAccountId: '',
-          goal: 5,
-        }
+        const payload = update
+          ? ({
+              customerId: data?.customerId || custId || '',
+              address: values.address,
+              agencyLogo: values.agencyLogo,
+              city: values.city,
+              companyPhone: values.companyPhone,
+              country: values.country,
+              name: values.name,
+              state: values.state,
+              whiteLabel: values.whiteLabel,
+              zipCode: values.zipCode,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              companyEmail: values.companyEmail,
+              connectAccountId: '',
+              goal: 5,
+            } as Agency)
+          : ({
+              id: data?.id ? data.id : generateObjectId(),
+              customerId: data?.customerId || custId || '',
+              address: values.address,
+              agencyLogo: values.agencyLogo,
+              city: values.city,
+              companyPhone: values.companyPhone,
+              country: values.country,
+              name: values.name,
+              state: values.state,
+              whiteLabel: values.whiteLabel,
+              zipCode: values.zipCode,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              companyEmail: values.companyEmail,
+              connectAccountId: '',
+              goal: 5,
+            } as Agency)
 
         if (update) {
-          response = await upsertAgency(payload)
+          response = await upsertAgency(payload, data?.id!)
         } else {
           response = await createAgency(payload)
         }
