@@ -18,7 +18,7 @@ async function SubAccountPage({ searchParams }: ISubAccountPage) {
   const user = await getAuthUserDetails()
   if (!user) return
 
-  const getFirstSubaccountWithAccess = user.Permissions.find((per) => per.access === true)
+  const getFirstSubaccountWithAccess = user.Permissions.find((permission) => permission.access === true)
 
   if (searchParams.state) {
     const statePath = searchParams.state.split('___')[0]

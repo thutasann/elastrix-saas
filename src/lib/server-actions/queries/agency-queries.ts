@@ -2,7 +2,7 @@
 
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { Agency, Plan, User } from '@prisma/client'
+import { Agency, Plan, Role, User } from '@prisma/client'
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { saveActivityLogsNotification } from './noti-queries'
@@ -24,7 +24,7 @@ export const verifyAndAcceptInvitation = async (): Promise<string | null> => {
       email: invitationExists.email,
       agencyId: invitationExists.agencyId,
       avatarUrl: user.imageUrl,
-      id: user.id,
+      id: generateObjectId(),
       name: `${user.firstName} ${user.lastName}`,
       role: invitationExists.role,
       createdAt: new Date(),
@@ -166,4 +166,31 @@ export const upsertAgency = async (agency: Agency, id?: string, price?: Plan) =>
   } catch (error) {
     Logger.error('upsert agency error ', error)
   }
+}
+
+/** send invitation */
+export const sendInvitation = async (role: Role, email: string, agencyId: string) => {
+  const response = await db.invitation.create({
+    data: {
+      email,
+      agencyId,
+      role,
+    },
+  })
+
+  try {
+    await clerkClient.invitations.createInvitation({
+      emailAddress: email,
+      redirectUrl: process.env.NEXT_PUBLIC_URL,
+      publicMetadata: {
+        throughInvitation: true,
+        role,
+      },
+    })
+  } catch (error) {
+    console.error('cleark send invitation error : ', error)
+    throw error
+  }
+
+  return response
 }

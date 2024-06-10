@@ -40,3 +40,8 @@ export const UserDataSchema = z.object({
   avatarUrl: z.string(),
   role: z.enum(['AGENCY_OWNER', 'AGENCY_ADMIN', 'SUBACCOUNT_USER', 'SUBACCOUNT_GUEST']),
 })
+
+export const InvitationUserDataSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(['AGENCY_ADMIN', 'SUBACCOUNT_USER', 'SUBACCOUNT_GUEST']),
+})
