@@ -1,5 +1,6 @@
 import {
   getAuthUserDetails,
+  getMedia,
   getUsersWithAgencySubAccountPermissionsSidebarOptions,
 } from '@/lib/server-actions/queries/subaccount-queries'
 import { getUserPermissions } from '@/lib/server-actions/queries/subaccount-queries'
@@ -39,3 +40,9 @@ export type AuthUserWithAgencySidebarOptionsAndSubAccounts = Prisma.PromiseRetur
 export type UsersWithAgencySubAccountPermissionsSidebarOptions = Prisma.PromiseReturnType<
   typeof getUsersWithAgencySubAccountPermissionsSidebarOptions
 >
+
+/** Get media files props */
+export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>
+
+/** Create media files props */
+export type CreateMediaType = Prisma.MediaCreateWithoutSubaccountInput

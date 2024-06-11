@@ -5,6 +5,7 @@ import { Logger } from '@/lib/logger'
 import { generateObjectId, getSideBarOptionsForSubAccount } from '@/lib/utils'
 import { SubAccount, User } from '@prisma/client'
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
+import { CreateMediaType } from '@/dto/types/agency'
 
 /** create sub account */
 export const createSubAccount = async (subAccount: SubAccount) => {
@@ -259,4 +260,39 @@ export const deleteUser = async (userId: string) => {
     },
   })
   return deletedUser
+}
+
+/** get media */
+export const getMedia = async (subaccountId: string) => {
+  const mediaFiles = await db.subAccount.findUnique({
+    where: {
+      id: subaccountId,
+    },
+    include: {
+      Media: true,
+    },
+  })
+  return mediaFiles
+}
+
+/** create media */
+export const createMedia = async (subaccountId: string, mediaFile: CreateMediaType) => {
+  const response = await db.media.create({
+    data: {
+      link: mediaFile.link,
+      name: mediaFile.name,
+      subAccountId: subaccountId,
+    },
+  })
+  return response
+}
+
+/** delete media */
+export const deleteMedia = async (mediaId: string) => {
+  const response = await db.media.delete({
+    where: {
+      id: mediaId,
+    },
+  })
+  return response
 }
