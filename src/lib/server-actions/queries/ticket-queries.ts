@@ -15,3 +15,13 @@ export const _getTicketsWithAllRelations = async (laneId: string) => {
   })
   return response
 }
+
+/** get pipeline details */
+export const getPipelineDetails = async (pipelineId: string) => {
+  const response = await db.pipeline.findUnique({
+    where: {
+      id: pipelineId,
+    },
+  })
+  return response
+}

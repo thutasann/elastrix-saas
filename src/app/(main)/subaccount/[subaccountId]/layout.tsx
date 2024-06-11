@@ -1,4 +1,3 @@
-import BlurPage from '@/components/organisms/agency/blur-page'
 import InfoBar from '@/components/organisms/agency/info-bar'
 import Sidebar from '@/components/organisms/agency/sidebar'
 import { Unauthorized } from '@/components/organisms/agency/unauthorized'
@@ -56,9 +55,7 @@ async function SubAccountLayout({ children, params }: ISubAccountLayout) {
           role={user.privateMetadata.role as Role}
           subAccountId={params.subaccountId as string}
         />
-        <div className='relative'>
-          <BlurPage>{children}</BlurPage>
-        </div>
+        <div className='relative'>{children}</div>
       </div>
     </div>
   )
