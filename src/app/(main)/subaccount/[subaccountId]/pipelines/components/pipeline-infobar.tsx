@@ -19,7 +19,6 @@ interface IPipelineInfobar {
 }
 
 function PipelineInfoBar({ pipelineId, pipelines, subAccountId }: IPipelineInfobar) {
-  console.log('pipelines', pipelines)
   const { setOpen: setOpenModal, setClose } = useModal()
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState(pipelineId)

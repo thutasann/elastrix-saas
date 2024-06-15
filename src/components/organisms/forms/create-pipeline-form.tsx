@@ -12,6 +12,10 @@ import { useToast } from '@/components/ui/use-toast'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { createPipeline } from '@/lib/server-actions/queries/ticket-queries'
+import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
+import { Button } from '@/components/ui/button'
+import { CustomLoader } from '@/components/molecules/loader'
 
 interface ICreatePipelineForm {
   defaultData?: Pipeline
@@ -43,6 +47,23 @@ function CreatePipelineForm({ defaultData, subAccountId }: ICreatePipelineForm) 
   const onSubmit = async (values: z.infer<typeof CreatePipelineFormSchema>) => {
     if (!subAccountId) return
     try {
+      const response = await createPipeline({
+        ...values,
+        subAccountId: subAccountId,
+      })
+
+      await saveActivityLogsNotification({
+        agencyId: undefined,
+        description: `Updates a pipeline | ${response?.name}`,
+        subAccountId: subAccountId,
+      })
+
+      toast({
+        title: 'Success',
+        description: 'Saved pipeline details',
+      })
+      setClose()
+      router.refresh()
     } catch (error) {
       toast({
         variant: 'destructive',
@@ -74,6 +95,10 @@ function CreatePipelineForm({ defaultData, subAccountId }: ICreatePipelineForm) 
                 </FormItem>
               )}
             />
+
+            <Button className='mt-4 w-20' disabled={isLoading} type='submit'>
+              {form.formState.isSubmitting ? <CustomLoader /> : 'Save'}
+            </Button>
           </form>
         </Form>
       </CardContent>

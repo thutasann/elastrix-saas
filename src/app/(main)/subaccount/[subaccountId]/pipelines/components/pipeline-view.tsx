@@ -1,8 +1,11 @@
 'use client'
 
-import React from 'react'
-import { LaneDetail, PipelineDestilsWithLanesCardsTagsTickets } from '@/dto/types/ticket'
+import React, { useEffect, useState } from 'react'
+import { LaneDetail, PipelineDestilsWithLanesCardsTagsTickets, TicketAndTags } from '@/dto/types/ticket'
 import { Lane, Ticket } from '@prisma/client'
+import { useModal } from '@/providers/modal-provider'
+import { useRouter } from 'next/navigation'
+import CustomModal from '@/components/molecules/modals/cutsom-modal'
 
 interface IPipelineView {
   lanes: LaneDetail[]
@@ -21,6 +24,30 @@ function Pipelineview({
   updateLanesOrder,
   updateTicketsOrder,
 }: IPipelineView) {
+  const router = useRouter()
+  const { setOpen } = useModal()
+  const ticketsFromAllLanes: TicketAndTags[] = []
+  const [allLanes, setAllLanes] = useState<LaneDetail[]>([])
+  const [allTickets, setAllTickets] = useState<TicketAndTags[]>(ticketsFromAllLanes)
+
+  lanes?.forEach((lane) => {
+    lane?.Tickets.forEach((t) => {
+      ticketsFromAllLanes.push(t)
+    })
+  })
+
+  useEffect(() => {
+    setAllLanes(lanes)
+  }, [lanes])
+
+  const handleAddLane = () => {
+    setOpen(
+      <CustomModal title='Create A Lane' subheading='Lanes allow you to group tickets'>
+        <h1>Lane Form</h1>
+      </CustomModal>,
+    )
+  }
+
   return <div>Pipelineview</div>
 }
 

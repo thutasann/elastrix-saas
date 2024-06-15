@@ -2,7 +2,7 @@
 
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
-import { Lane, Ticket } from '@prisma/client'
+import { Lane, Prisma, Ticket } from '@prisma/client'
 
 /** get tickets info with all relations */
 export const _getTicketsWithAllRelations = async (laneId: string) => {
@@ -46,6 +46,38 @@ export const getLanesWithTicketAndTags = async (pipelineId: string) => {
           Customer: true,
         },
       },
+    },
+  })
+  return response
+}
+
+/** create pipeline */
+export const createPipeline = async (pipeline: Prisma.PipelineUncheckedCreateInput) => {
+  const response = await db.pipeline.create({
+    data: {
+      ...pipeline,
+    },
+  })
+  return response
+}
+
+/** update pipeline */
+export const updatePipeline = async (pipeline: Prisma.PipelineUncheckedCreateInput, id: string) => {
+  const response = await db.pipeline.upsert({
+    where: { id },
+    create: pipeline,
+    update: {
+      ...pipeline,
+    },
+  })
+  return response
+}
+
+/** delete pipeline */
+export const deletePipeline = async (pipelineId: string) => {
+  const response = await db.pipeline.delete({
+    where: {
+      id: pipelineId,
     },
   })
   return response
