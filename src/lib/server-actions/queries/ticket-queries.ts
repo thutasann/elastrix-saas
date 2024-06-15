@@ -1,6 +1,8 @@
 'use server'
 
 import { db } from '@/lib/db'
+import { Logger } from '@/lib/logger'
+import { Lane, Ticket } from '@prisma/client'
 
 /** get tickets info with all relations */
 export const _getTicketsWithAllRelations = async (laneId: string) => {
@@ -47,4 +49,46 @@ export const getLanesWithTicketAndTags = async (pipelineId: string) => {
     },
   })
   return response
+}
+
+/** update lanes order */
+export const updateLanesOrder = async (lanes: Lane[]) => {
+  if (!lanes) return
+  try {
+    const updateTrans = lanes.map((lane) =>
+      db.lane.update({
+        where: {
+          id: lane.id,
+        },
+        data: {
+          order: lane.order,
+        },
+      }),
+    )
+    await db.$transaction(updateTrans)
+    Logger.info('Done lanes re-ordered')
+  } catch (error) {
+    console.error('update lanes order :', error)
+  }
+}
+
+/** update tickets order */
+export const updateTicketsOrder = async (tickets: Ticket[]) => {
+  try {
+    const updateTrans = tickets.map((ticket) =>
+      db.ticket.update({
+        where: {
+          id: ticket.id,
+        },
+        data: {
+          order: ticket.order,
+          laneId: ticket.laneId,
+        },
+      }),
+    )
+    await db.$transaction(updateTrans)
+    Logger.info('Done Ticket re-ordered ')
+  } catch (error) {
+    console.error('update tickets order error: ', error)
+  }
 }
