@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { getLanesWithTicketAndTags, getPipelineDetails } from '@/lib/server-actions/queries/ticket-queries'
 import { redirect } from 'next/navigation'
 import React from 'react'
+import PipelineInfoBar from './components/pipeline-infobar'
 
 interface IPipelineDetailPage {
   params: {
@@ -27,7 +28,9 @@ async function PipelineDetailPage({ params }: IPipelineDetailPage) {
 
   return (
     <Tabs defaultValue='view' className='w-full'>
-      <TabsList className='mb-4 h-16 w-full justify-between border-b-2 bg-transparent'></TabsList>
+      <TabsList className='mb-4 h-16 w-full justify-between border-b-2 bg-transparent'>
+        <PipelineInfoBar pipelineId={params.pipelineId} subAccountId={params.subaccountId} pipelines={pipelines} />
+      </TabsList>
     </Tabs>
   )
 }

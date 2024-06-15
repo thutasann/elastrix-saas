@@ -1,7 +1,8 @@
+import BlurPage from '@/components/organisms/agency/blur-page'
 import React from 'react'
 
 function SubAccountDetailPage() {
-  return <div>SubAccountDetailPage</div>
+  return <BlurPage>SubAccountDetailPage</BlurPage>
 }
 
 export default SubAccountDetailPage

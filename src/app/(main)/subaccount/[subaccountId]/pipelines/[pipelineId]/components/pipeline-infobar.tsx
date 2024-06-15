@@ -1,7 +1,15 @@
 'use client'
 
+import CustomModal from '@/components/molecules/modals/cutsom-modal'
+import CreatePipelineForm from '@/components/organisms/forms/create-pipeline-form'
+import { Button } from '@/components/ui/button'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 import { useModal } from '@/providers/modal-provider'
 import { Pipeline } from '@prisma/client'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import Link from 'next/link'
 import React, { useState } from 'react'
 
 interface IPipelineInfobar {
@@ -11,11 +19,65 @@ interface IPipelineInfobar {
 }
 
 function PipelineInfoBar({ pipelineId, pipelines, subAccountId }: IPipelineInfobar) {
+  console.log('pipelines', pipelines)
   const { setOpen: setOpenModal, setClose } = useModal()
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState(pipelineId)
 
-  return <div>PipelineInfoBar</div>
+  const handleClickCreatePipeline = () => {
+    setOpenModal(
+      <CustomModal
+        title='Create A Pipeline'
+        subheading='Pipelines allows you to group tickets into lanes and track your business processes all in one place.'
+      >
+        <CreatePipelineForm subAccountId={subAccountId} />
+      </CustomModal>,
+    )
+  }
+
+  return (
+    <div>
+      <div className='flex items-end gap-2'>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant='outline' role='combobox' aria-expanded={open} className='w-[200px] justify-between'>
+              {value ? pipelines.find((pipeline) => pipeline.id === value)?.name : 'Select a pipeline...'}
+              <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className='w-[200px] p-2'>
+            <Command>
+              <CommandInput placeholder='Search Account...' />
+              <CommandList className='mt-2'>
+                <CommandEmpty>No pipelines found.</CommandEmpty>
+                <CommandGroup>
+                  {pipelines.map((pipeline) => (
+                    <Link key={pipeline.id} href={`/subaccount/${subAccountId}/pipelines/${pipeline.id}`}>
+                      <CommandItem
+                        key={pipeline.id}
+                        value={pipeline.id}
+                        onSelect={(currentValue) => {
+                          setValue(currentValue)
+                          setOpen(false)
+                        }}
+                      >
+                        <Check className={cn('mr-2 h-4 w-4', value === pipeline.id ? 'opacity-100' : 'opacity-0')} />
+                        {pipeline.name}
+                      </CommandItem>
+                    </Link>
+                  ))}
+                  <Button variant='secondary' className='mt-4 flex w-full gap-2' onClick={handleClickCreatePipeline}>
+                    <Plus size={15} />
+                    Create Pipeline
+                  </Button>
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
+  )
 }
 
 export default PipelineInfoBar

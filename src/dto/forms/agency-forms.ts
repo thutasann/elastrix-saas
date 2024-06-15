@@ -49,6 +49,9 @@ export const InvitationUserDataSchema = z.object({
   role: z.enum(['AGENCY_ADMIN', 'SUBACCOUNT_USER', 'SUBACCOUNT_GUEST']),
 })
 
+/**
+ * Upload Media Schema
+ */
 export const UploadMediaSchema = z.object({
   link: z.string().min(1, { message: 'Media File is required' }),
   name: z.string().min(1, { message: 'Name is required' }),
