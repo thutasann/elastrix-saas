@@ -9,7 +9,7 @@ import * as z from 'zod'
 import { LaneFormSchema } from '@/dto/forms/ticket-forms'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useToast } from '@/components/ui/use-toast'
-import { upsertLane, getPipelineDetails } from '@/lib/server-actions/queries/ticket-queries'
+import { updateLane, getPipelineDetails, createLane } from '@/lib/server-actions/queries/ticket-queries'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -51,12 +51,23 @@ function CreateLaneForm({ defaultData, pipelineId }: ICreateLaneForm) {
   const onSubmit = async (values: z.infer<typeof LaneFormSchema>) => {
     if (!pipelineId) return
     try {
-      const response = await upsertLane({
-        ...values,
-        id: defaultData?.id,
-        pipelineId: pipelineId,
-        order: defaultData?.order,
-      })
+      let response
+      if (defaultData?.id) {
+        response = await updateLane(
+          {
+            ...values,
+            pipelineId: pipelineId,
+            order: defaultData?.order,
+          },
+          defaultData?.id,
+        )
+      } else {
+        response = await createLane({
+          ...values,
+          pipelineId: pipelineId,
+          order: defaultData?.order,
+        })
+      }
 
       const pipelineDetail = await getPipelineDetails(pipelineId)
       if (!pipelineDetail) return

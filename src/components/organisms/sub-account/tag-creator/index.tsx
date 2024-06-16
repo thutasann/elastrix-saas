@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
-import { getTagsFromSubaccount, upsertTag } from '@/lib/server-actions/queries/subaccount-queries'
+import { createTag, getTagsFromSubaccount } from '@/lib/server-actions/queries/subaccount-queries'
 import { generateObjectId } from '@/lib/utils'
 import { Tag } from '@prisma/client'
 import { useRouter } from 'next/navigation'
@@ -90,22 +90,20 @@ function TagCreator({ getSelectedTags, subAccountId, defaultTags }: ITagCreator)
       })
       return
     }
-    const tagData: Tag = {
+    const tagData = {
       color: selectedColor,
       createdAt: new Date(),
-      id: generateObjectId(),
       name: value,
       subAccountId,
       updatedAt: new Date(),
-      ticketId: '',
-    }
+    } as Tag
 
     setTags([...tags, tagData])
     setValue('')
     setSelectedColor('')
 
     try {
-      const response = await upsertTag(subAccountId, tagData)
+      const response = await createTag(subAccountId, tagData)
       toast({
         title: 'Created the tag',
       })
@@ -169,7 +167,14 @@ function TagCreator({ getSelectedTags, subAccountId, defaultTags }: ITagCreator)
           ))}
         </div>
         <div className='relative'>
-          <CommandInput placeholder='Search for tag...' value={value} onValueChange={setValue} />
+          <CommandInput
+            placeholder='Search for tag...'
+            value={value}
+            onValueChange={setValue}
+            style={{
+              color: selectedColor,
+            }}
+          />
           <PlusCircleIcon
             onClick={handleAddTag}
             size={20}

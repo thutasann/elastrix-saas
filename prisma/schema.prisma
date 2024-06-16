@@ -139,11 +139,12 @@ model Tag {
   color        String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  subAccountId String  @db.ObjectId
-  ticketId String @db.ObjectId
 
-  SubAccount SubAccount @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
-  Ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  subAccountId String? @db.ObjectId
+  SubAccount SubAccount? @relation(fields: [subAccountId], references: [id], onDelete: Cascade)
+
+  ticketId String? @db.ObjectId
+  Ticket Ticket? @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   @@index([subAccountId])
   @@index([ticketId])

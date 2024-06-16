@@ -346,15 +346,11 @@ export const getTagsFromSubaccount = async (subaccountId: string) => {
 }
 
 /** upsert tag */
-export const upsertTag = async (subaccountId: string, tag: Prisma.TagUncheckedCreateInput) => {
+export const createTag = async (subaccountId: string, tag: Prisma.TagUncheckedCreateInput) => {
+  console.log('subaccountId', subaccountId)
   try {
-    const response = await db.tag.upsert({
-      where: {
-        id: tag.id || generateObjectId(),
-        subAccountId: subaccountId,
-      },
-      update: tag,
-      create: {
+    const response = await db.tag.create({
+      data: {
         ...tag,
         subAccountId: subaccountId,
       },

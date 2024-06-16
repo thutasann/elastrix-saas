@@ -3,19 +3,36 @@
 import CustomModal from '@/components/molecules/modals/cutsom-modal'
 import CreateLaneForm from '@/components/organisms/forms/create-lane-form'
 import TicketForm from '@/components/organisms/forms/ticket-form'
-import { AlertDialog } from '@/components/ui/alert-dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
-import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { LaneDetail, TicketWithTags } from '@/dto/types/ticket'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 import { deleteLane } from '@/lib/server-actions/queries/ticket-queries'
 import { cn } from '@/lib/utils'
 import { useModal } from '@/providers/modal-provider'
-import { AwardIcon, MoreVertical } from 'lucide-react'
+import { Edit, MoreVertical, PlusCircleIcon, Trash } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { setPriority } from 'os'
 import React, { Dispatch, SetStateAction, useMemo } from 'react'
 import { Draggable, Droppable } from 'react-beautiful-dnd'
+import PipelineTicket from './pipeline-ticket'
 
 interface IPipelineLane {
   allTickets: TicketWithTags
@@ -105,7 +122,8 @@ function PipelineLane({
           <div {...provided.draggableProps} ref={provided.innerRef} className='h-full'>
             <AlertDialog>
               <DropdownMenu>
-                <div className='relative h-[700px] w-[300px] flex-shrink-0 overflow-visible rounded-lg bg-slate-200/30 px-4 dark:bg-background/20'>
+                <div className='relative m-2 h-[700px] w-[300px] flex-shrink-0 overflow-visible rounded-lg border bg-slate-200/30 px-4 dark:bg-background/20'>
+                  {/* lane */}
                   <div
                     {...provided.dragHandleProps}
                     className='absolute left-0 right-0 top-0 z-10 h-auto bg-slate-200/60 p-3 backdrop-blur-lg dark:bg-background/40'
@@ -122,12 +140,67 @@ function PipelineLane({
                     </div>
                   </div>
 
+                  {/* pipeline tickets */}
                   <Droppable droppableId={laneDetails.id} key={laneDetails.id} type='ticket'>
                     {(provided) => {
-                      return <div></div>
+                      return (
+                        <div className='max-h-[700px] overflow-auto pt-12'>
+                          <div {...provided.droppableProps} ref={provided.innerRef} className='mt-2'>
+                            {tickets.map((ticket, index) => {
+                              return (
+                                <PipelineTicket
+                                  allTickets={allTickets}
+                                  setAllTickets={setAllTickets}
+                                  subaccountId={subaccountId}
+                                  ticket={ticket}
+                                  key={ticket.id.toString()}
+                                  index={index}
+                                />
+                              )
+                            })}
+                            {provided.placeholder}
+                          </div>
+                        </div>
+                      )
                     }}
                   </Droppable>
+
+                  {/* dropdown item */}
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Options</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <AlertDialogTrigger>
+                      <DropdownMenuItem className='flex w-full items-center gap-2'>
+                        <Trash size={15} />
+                        Delete
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+
+                    <DropdownMenuItem className='flex items-center gap-2' onClick={handleEditLane}>
+                      <Edit size={15} />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className='flex items-center gap-2' onClick={handleCreateTicket}>
+                      <PlusCircleIcon size={15} />
+                      Create Ticket
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
                 </div>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your account and remove your data from
+                      our servers.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className='flex items-center'>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction className='bg-destructive' onClick={handleDeleteLane}>
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
               </DropdownMenu>
             </AlertDialog>
           </div>

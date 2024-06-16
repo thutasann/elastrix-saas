@@ -17,7 +17,12 @@ import * as z from 'zod'
 import TagCreator from '../sub-account/tag-creator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { User2 } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, User2 } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { cn } from '@/lib/utils'
+import { CustomLoader } from '@/components/molecules/loader'
 
 interface ITicketForm {
   laneId: string
@@ -89,54 +94,61 @@ function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4'>
-            <FormField
-              disabled={isLoading}
-              control={form.control}
-              name='name'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ticket Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Name' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              disabled={isLoading}
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder='Description' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              disabled={isLoading}
-              control={form.control}
-              name='value'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Ticket Value</FormLabel>
-                  <FormControl>
-                    <Input placeholder='Value' {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Ticket Info */}
+            <div className='space-y-4'>
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name='name'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ticket Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Name' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name='description'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder='Description' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name='value'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ticket Value</FormLabel>
+                    <FormControl>
+                      <Input placeholder='Value' {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Tags */}
             <h3>Add tags</h3>
             <TagCreator
               subAccountId={subaccountId}
               getSelectedTags={setTags}
               defaultTags={defaultData?.ticket?.Tags || []}
             />
+
+            {/* Assgin Team Mmebers */}
             <FormLabel>Assigned To Team Member</FormLabel>
             <Select onValueChange={setAssignedTo} defaultValue={assignedTo}>
               <SelectTrigger>
@@ -172,6 +184,57 @@ function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Customer */}
+            <FormLabel>Customer</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild className='w-full'>
+                <Button variant='outline' role='combobox' className='justify-between'>
+                  {contact ? contactList.find((c) => c.id === contact)?.name : 'Select Customer...'}
+                  <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className='w-[400px] p-2'>
+                <Command>
+                  <CommandInput
+                    placeholder='Search...'
+                    className='h-9'
+                    value={search}
+                    onChangeCapture={async (value) => {
+                      //@ts-ignore
+                      setSearch(value.target.value)
+                      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+                      saveTimerRef.current = setTimeout(async () => {
+                        const response = await searchContacts(
+                          //@ts-ignore
+                          value.target.value,
+                        )
+                        setContactList(response)
+                        setSearch('')
+                      }, 1000)
+                    }}
+                  />
+                  <CommandEmpty>No Customer found.</CommandEmpty>
+                  <CommandGroup>
+                    {contactList.map((c) => (
+                      <CommandItem
+                        key={c.id}
+                        value={c.id}
+                        onSelect={(currentValue) => {
+                          setContact(currentValue === contact ? '' : currentValue)
+                        }}
+                      >
+                        {c.name}
+                        <CheckIcon className={cn('ml-auto h-4 w-4', contact === c.id ? 'opacity-100' : 'opacity-0')} />
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+              <Button className='mt-4 w-20' disabled={isLoading} type='submit'>
+                {form.formState.isSubmitting ? <CustomLoader /> : 'Save'}
+              </Button>
+            </Popover>
           </form>
         </Form>
       </CardContent>

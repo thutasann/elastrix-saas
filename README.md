@@ -24,7 +24,7 @@ This is the Web Builder and Project Management SAAS.
 ### Prisma init
 
 ```bash
-npx prisma init --datasource-provider mysql
+npx prisma init --datasource-provider mongodb
 ```
 
 ### Prisma Generate

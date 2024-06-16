@@ -144,7 +144,7 @@ export const updateTicketsOrder = async (tickets: Ticket[]) => {
 }
 
 /** create lane */
-export const upsertLane = async (lane: Prisma.LaneUncheckedCreateInput) => {
+export const createLane = async (lane: Prisma.LaneUncheckedCreateInput) => {
   let order: number
 
   if (!lane.order) {
@@ -159,10 +159,35 @@ export const upsertLane = async (lane: Prisma.LaneUncheckedCreateInput) => {
     order = lane.order
   }
 
-  const response = await db.lane.upsert({
-    where: { id: lane.id || generateObjectId() },
-    update: lane,
-    create: {
+  const response = await db.lane.create({
+    data: {
+      ...lane,
+      order: order,
+    },
+  })
+
+  return response
+}
+
+/** update lane */
+export const updateLane = async (lane: Prisma.LaneUncheckedCreateInput, id?: string) => {
+  let order: number
+
+  if (!lane.order) {
+    const lanes = await db.lane.findMany({
+      where: {
+        pipelineId: lane.pipelineId,
+      },
+    })
+
+    order = lanes.length
+  } else {
+    order = lane.order
+  }
+
+  const response = await db.lane.update({
+    where: { id: id },
+    data: {
       ...lane,
       order: order,
     },
@@ -186,6 +211,16 @@ export const deleteLane = async (laneId: string) => {
   const response = await db.lane.delete({
     where: {
       id: laneId,
+    },
+  })
+  return response
+}
+
+/** delete ticket */
+export const deleteTicket = async (ticketId: string) => {
+  const response = await db.ticket.delete({
+    where: {
+      id: ticketId,
     },
   })
   return response
