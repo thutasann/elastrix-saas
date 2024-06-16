@@ -1,4 +1,4 @@
-# Elastrix SAAS
+# Elastrix
 
 This is the Web Builder and Project Management SAAS.
 

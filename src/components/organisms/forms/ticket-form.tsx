@@ -1,0 +1,182 @@
+'use client'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { TicketFormSchema } from '@/dto/forms/ticket-forms'
+import { TicketWithTags } from '@/dto/types/ticket'
+import { getSubAccountWithTeamMembers, searchContacts } from '@/lib/server-actions/queries/subaccount-queries'
+import { useModal } from '@/providers/modal-provider'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Contact, Tag, User } from '@prisma/client'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import TagCreator from '../sub-account/tag-creator'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { User2 } from 'lucide-react'
+
+interface ITicketForm {
+  laneId: string
+  subaccountId: string
+  getNewTicket: (ticket: TicketWithTags[0]) => void
+}
+
+function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
+  const { data: defaultData, setClose } = useModal()
+  const router = useRouter()
+  const [tags, setTags] = useState<Tag[]>([])
+  const [contact, setContact] = useState('')
+  const [search, setSearch] = useState('')
+  const [contactList, setContactList] = useState<Contact[]>([])
+  const [allTeamMembers, setAllTeamMembers] = useState<User[]>([])
+  const [assignedTo, setAssignedTo] = useState(defaultData.ticket?.Assigned?.id || '')
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout>>()
+
+  const form = useForm<z.infer<typeof TicketFormSchema>>({
+    mode: 'onChange',
+    resolver: zodResolver(TicketFormSchema),
+    defaultValues: {
+      name: defaultData?.ticket?.name || '',
+      description: defaultData.ticket?.description || '',
+      value: String(defaultData.ticket?.value || 0),
+    },
+  })
+
+  useEffect(() => {
+    if (subaccountId) {
+      const fetchData = async () => {
+        const response = await getSubAccountWithTeamMembers(subaccountId)
+        if (response) setAllTeamMembers(response)
+      }
+      fetchData()
+    }
+  }, [subaccountId])
+
+  useEffect(() => {
+    if (defaultData.ticket) {
+      form.reset({
+        name: defaultData.ticket.name || '',
+        description: defaultData.ticket?.description || '',
+        value: String(defaultData.ticket?.value || 0),
+      })
+      if (defaultData.ticket.customerId) {
+        setContact(defaultData.ticket.customerId)
+      }
+
+      const fetchData = async () => {
+        const response = await searchContacts(defaultData?.ticket?.Customer?.name || '')
+        setContactList(response)
+      }
+      fetchData()
+    }
+  }, [defaultData, form])
+
+  const isLoading = form.formState.isLoading
+
+  const onSubmit = async (values: z.infer<typeof TicketFormSchema>) => {
+    if (!laneId) return
+  }
+
+  return (
+    <Card className='w-full'>
+      <CardHeader>
+        <CardTitle>Ticket Details</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col gap-4'>
+            <FormField
+              disabled={isLoading}
+              control={form.control}
+              name='name'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ticket Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder='Name' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              disabled={isLoading}
+              control={form.control}
+              name='description'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder='Description' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              disabled={isLoading}
+              control={form.control}
+              name='value'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ticket Value</FormLabel>
+                  <FormControl>
+                    <Input placeholder='Value' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <h3>Add tags</h3>
+            <TagCreator
+              subAccountId={subaccountId}
+              getSelectedTags={setTags}
+              defaultTags={defaultData?.ticket?.Tags || []}
+            />
+            <FormLabel>Assigned To Team Member</FormLabel>
+            <Select onValueChange={setAssignedTo} defaultValue={assignedTo}>
+              <SelectTrigger>
+                <SelectValue
+                  placeholder={
+                    <div className='flex items-center gap-2'>
+                      <Avatar className='h-8 w-8'>
+                        <AvatarImage alt='contact' />
+                        <AvatarFallback className='bg-primary text-sm text-white'>
+                          <User2 size={14} />
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <span className='text-sm text-muted-foreground'>Not Assigned</span>
+                    </div>
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {allTeamMembers.map((teamMember) => (
+                  <SelectItem key={teamMember.id} value={teamMember.id}>
+                    <div className='flex items-center gap-2'>
+                      <Avatar className='h-8 w-8'>
+                        <AvatarImage alt='contact' src={teamMember.avatarUrl} />
+                        <AvatarFallback className='bg-primary text-sm text-white'>
+                          <User2 size={14} />
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <span className='text-sm text-muted-foreground'>{teamMember.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default TicketForm

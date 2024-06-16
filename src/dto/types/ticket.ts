@@ -1,4 +1,4 @@
-import { getPipelineDetails } from '@/lib/server-actions/queries/ticket-queries'
+import { getPipelineDetails, getTicketsWithTags } from '@/lib/server-actions/queries/ticket-queries'
 import { Contact, Lane, Prisma, Tag, Ticket, User } from '@prisma/client'
 
 /** Ticket and Tags */
@@ -15,3 +15,6 @@ export type LaneDetail = Lane & {
 
 /** Pipeline Details with Lanes, Cards, Tags and Tickets */
 export type PipelineDestilsWithLanesCardsTagsTickets = Prisma.PromiseReturnType<typeof getPipelineDetails>
+
+/** Tickets with Tags, Customer and Assigned */
+export type TicketWithTags = Prisma.PromiseReturnType<typeof getTicketsWithTags>

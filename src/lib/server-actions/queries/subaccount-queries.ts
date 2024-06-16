@@ -3,7 +3,7 @@
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { generateObjectId, getSideBarOptionsForSubAccount } from '@/lib/utils'
-import { SubAccount, User } from '@prisma/client'
+import { Prisma, SubAccount, User } from '@prisma/client'
 import { clerkClient, currentUser } from '@clerk/nextjs/server'
 import { CreateMediaType } from '@/dto/types/agency'
 
@@ -295,4 +295,72 @@ export const deleteMedia = async (mediaId: string) => {
     },
   })
   return response
+}
+
+/** get subaccount with team members */
+export const getSubAccountWithTeamMembers = async (subaccountId: string) => {
+  const subaccuntUsersWithAccess = await db.user.findMany({
+    where: {
+      Agency: {
+        SubAccount: {
+          some: {
+            id: subaccountId,
+          },
+        },
+      },
+      role: 'SUBACCOUNT_USER',
+      Permissions: {
+        some: {
+          subAccountId: subaccountId,
+          access: true,
+        },
+      },
+    },
+  })
+  return subaccuntUsersWithAccess
+}
+
+/** search contacts */
+export const searchContacts = async (searchTerms: string) => {
+  const response = await db.contact.findMany({
+    where: {
+      name: {
+        contains: searchTerms,
+      },
+    },
+  })
+  return response
+}
+
+/** get tags from subaccount */
+export const getTagsFromSubaccount = async (subaccountId: string) => {
+  const response = await db.subAccount.findUnique({
+    where: {
+      id: subaccountId,
+    },
+    select: {
+      Tags: true,
+    },
+  })
+  return response
+}
+
+/** upsert tag */
+export const upsertTag = async (subaccountId: string, tag: Prisma.TagUncheckedCreateInput) => {
+  try {
+    const response = await db.tag.upsert({
+      where: {
+        id: tag.id || generateObjectId(),
+        subAccountId: subaccountId,
+      },
+      update: tag,
+      create: {
+        ...tag,
+        subAccountId: subaccountId,
+      },
+    })
+    return response
+  } catch (error) {
+    console.log('upert tag error : ', error)
+  }
 }

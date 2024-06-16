@@ -217,3 +217,5 @@ export const defaultStyles: React.CSSProperties = {
   textAlign: 'left',
   opacity: '100%',
 }
+
+export const currencyNumberRegex = /^\d+(\.\d{1,2})?$/

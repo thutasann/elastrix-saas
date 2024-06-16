@@ -6,6 +6,11 @@ import { Lane, Ticket } from '@prisma/client'
 import { useModal } from '@/providers/modal-provider'
 import { useRouter } from 'next/navigation'
 import CustomModal from '@/components/molecules/modals/cutsom-modal'
+import CreateLaneForm from '@/components/organisms/forms/create-lane-form'
+import { DragDropContext, type DropResult, Droppable } from 'react-beautiful-dnd'
+import { Button } from '@/components/ui/button'
+import { Plus } from 'lucide-react'
+import PipelineLane from './pipeline-lane'
 
 interface IPipelineView {
   lanes: LaneDetail[]
@@ -28,6 +33,7 @@ function Pipelineview({
   const { setOpen } = useModal()
   const ticketsFromAllLanes: TicketAndTags[] = []
   const [allLanes, setAllLanes] = useState<LaneDetail[]>([])
+  console.log('allLanes', allLanes)
   const [allTickets, setAllTickets] = useState<TicketAndTags[]>(ticketsFromAllLanes)
 
   lanes?.forEach((lane) => {
@@ -43,12 +49,116 @@ function Pipelineview({
   const handleAddLane = () => {
     setOpen(
       <CustomModal title='Create A Lane' subheading='Lanes allow you to group tickets'>
-        <h1>Lane Form</h1>
+        <CreateLaneForm pipelineId={pipelineId} />
       </CustomModal>,
     )
   }
 
-  return <div>Pipelineview</div>
+  const onDragEnd = (dropResult: DropResult) => {
+    const { destination, source, type } = dropResult
+    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+      return
+    }
+
+    switch (type) {
+      case 'lane': {
+        const newLanes = [...allLanes]
+          .toSpliced(source.index, 1)
+          .toSpliced(destination.index, 0, allLanes[source.index])
+          .map((lane, index) => {
+            return { ...lane, order: index }
+          })
+        setAllLanes(newLanes)
+        updateLanesOrder(newLanes)
+      }
+
+      case 'ticket': {
+        let newLanes = [...allLanes]
+        const originalLane = newLanes.find((lane) => lane.id, source.droppableId)
+
+        const destinationLane = newLanes.find((lane) => lane.id === destination.droppableId)
+
+        if (!originalLane || !destinationLane) return
+
+        if (source.droppableId === destination.droppableId) {
+          const newOrderedTickets = [...originalLane.Tickets]
+            .toSpliced(source.index, 1)
+            .toSpliced(destination.index, 0, originalLane.Tickets[source.index])
+            .map((item, idx) => {
+              return { ...item, order: idx }
+            })
+
+          originalLane.Tickets = newOrderedTickets
+          setAllLanes(newLanes)
+          updateTicketsOrder(newOrderedTickets)
+          router.refresh()
+        } else {
+          const [currentTicket] = originalLane.Tickets.splice(source.index, 1)
+
+          originalLane.Tickets.forEach((ticket, index) => {
+            ticket.order = index
+          })
+
+          destinationLane.Tickets.splice(destination.index, 0, {
+            ...currentTicket,
+            laneId: destination.droppableId,
+          })
+
+          destinationLane.Tickets.forEach((ticket, index) => {
+            ticket.order = index
+          })
+
+          setAllLanes(newLanes)
+          updateTicketsOrder({
+            ...destinationLane.Tickets,
+            ...originalLane.Tickets,
+          })
+
+          router.refresh()
+        }
+      }
+    }
+  }
+
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className='use-automation-zoom-in rounded-xl bg-white/60 p-4 dark:bg-background/60'>
+        <div className='flex items-center justify-between'>
+          <h1 className='text-lg font-bold'>{pipelineDetails?.name}</h1>
+          <Button className='flex items-center gap-4' onClick={handleAddLane}>
+            <Plus size={15} />
+            Create Lane
+          </Button>
+        </div>
+        <Droppable droppableId='lanes' type='lane' direction='horizontal' key='lanes'>
+          {(provided) => {
+            return (
+              <div
+                className='flex items-center gap-x-2 overflow-auto'
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+              >
+                <div className='mt-4 flex'>
+                  {allLanes.map((lane, index) => (
+                    <PipelineLane
+                      allTickets={allTickets}
+                      setAllTickets={setAllTickets}
+                      subaccountId={subAccountId}
+                      pipelineId={pipelineId}
+                      tickets={lane.Tickets}
+                      laneDetails={lane}
+                      index={index}
+                      key={lane.id}
+                    />
+                  ))}
+                </div>
+              </div>
+            )
+          }}
+        </Droppable>
+      </div>
+    </DragDropContext>
+  )
 }
 
 export default Pipelineview
