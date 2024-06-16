@@ -3,7 +3,7 @@
 import { db } from '@/lib/db'
 import { Logger } from '@/lib/logger'
 import { generateObjectId } from '@/lib/utils'
-import { Lane, Prisma, Ticket } from '@prisma/client'
+import { Lane, Prisma, Tag, Ticket } from '@prisma/client'
 
 /** get tickets info with all relations */
 export const _getTicketsWithAllRelations = async (laneId: string) => {
@@ -224,4 +224,39 @@ export const deleteTicket = async (ticketId: string) => {
     },
   })
   return response
+}
+
+/** create ticket */
+export const createTicket = async (ticket: Prisma.TicketUncheckedCreateInput, tags: Tag[]) => {
+  let order: number
+  if (!ticket.order) {
+    const tickets = await db.ticket.findMany({
+      where: {
+        laneId: ticket.laneId,
+      },
+    })
+    order = tickets.length
+  } else {
+    order = ticket.order
+  }
+
+  try {
+    const response = await db.ticket.create({
+      data: {
+        ...ticket,
+        order,
+        TagIds: tags.map((tag) => tag.id),
+      },
+      include: {
+        Assigned: true,
+        Customer: true,
+        Tags: true,
+        Lane: true,
+      },
+    })
+
+    return response
+  } catch (error) {
+    console.log('create ticket error: ', error)
+  }
 }

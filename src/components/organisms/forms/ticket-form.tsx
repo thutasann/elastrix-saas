@@ -23,6 +23,9 @@ import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
 import { cn } from '@/lib/utils'
 import { CustomLoader } from '@/components/molecules/loader'
+import { useToast } from '@/components/ui/use-toast'
+import { createTicket } from '@/lib/server-actions/queries/ticket-queries'
+import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 
 interface ITicketForm {
   laneId: string
@@ -33,6 +36,7 @@ interface ITicketForm {
 function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
   const { data: defaultData, setClose } = useModal()
   const router = useRouter()
+  const { toast } = useToast()
   const [tags, setTags] = useState<Tag[]>([])
   const [contact, setContact] = useState('')
   const [search, setSearch] = useState('')
@@ -84,6 +88,41 @@ function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
 
   const onSubmit = async (values: z.infer<typeof TicketFormSchema>) => {
     if (!laneId) return
+    try {
+      console.log('tags', tags)
+      const response = await createTicket(
+        {
+          ...values,
+          laneId,
+          // id: defaultData.ticket?.id,
+          assignedUserId: assignedTo,
+          ...(contact ? { customerId: contact } : {}),
+        },
+        tags,
+      )
+
+      toast({
+        title: 'Success',
+        description: 'Ticket saved!',
+      })
+      setClose()
+      if (response) {
+        getNewTicket(response)
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Oppse!',
+          description: 'Could not save ticket details',
+        })
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Oppse!',
+        description: 'Could not save ticket details',
+      })
+    }
+    router.refresh()
   }
 
   return (
