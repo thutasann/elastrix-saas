@@ -20,7 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { CheckIcon, ChevronsUpDownIcon, User2 } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { cn } from '@/lib/utils'
 import { CustomLoader } from '@/components/molecules/loader'
 import { useToast } from '@/components/ui/use-toast'
@@ -41,6 +41,7 @@ function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
   const [contact, setContact] = useState('')
   const [search, setSearch] = useState('')
   const [contactList, setContactList] = useState<Contact[]>([])
+  console.log('contactList', contactList)
   const [allTeamMembers, setAllTeamMembers] = useState<User[]>([])
   const [assignedTo, setAssignedTo] = useState(defaultData.ticket?.Assigned?.id || '')
   const saveTimerRef = useRef<ReturnType<typeof setTimeout>>()
@@ -241,7 +242,7 @@ function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
             <Popover>
               <PopoverTrigger asChild className='w-full'>
                 <Button variant='outline' role='combobox' className='justify-between'>
-                  {contact ? contactList.find((c) => c.id === contact)?.name : 'Select Customer...'}
+                  {contact ? contactList?.find((c) => c.id === contact)?.name : 'Select Customer...'}
                   <ChevronsUpDownIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                 </Button>
               </PopoverTrigger>
@@ -265,21 +266,25 @@ function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
                       }, 1000)
                     }}
                   />
-                  <CommandEmpty>No Customer found.</CommandEmpty>
-                  <CommandGroup>
-                    {contactList.map((c) => (
-                      <CommandItem
-                        key={c.id}
-                        value={c.id}
-                        onSelect={(currentValue) => {
-                          setContact(currentValue === contact ? '' : currentValue)
-                        }}
-                      >
-                        {c.name}
-                        <CheckIcon className={cn('ml-auto h-4 w-4', contact === c.id ? 'opacity-100' : 'opacity-0')} />
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                  <CommandList>
+                    <CommandGroup>
+                      <CommandEmpty>No Customer found.</CommandEmpty>
+                      {contactList?.map((c) => (
+                        <CommandItem
+                          key={c.id}
+                          value={c.id}
+                          onSelect={(currentValue) => {
+                            setContact(currentValue === contact ? '' : currentValue)
+                          }}
+                        >
+                          {c.name}
+                          <CheckIcon
+                            className={cn('ml-auto h-4 w-4', contact === c.id ? 'opacity-100' : 'opacity-0')}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
               <Button className='mt-4 w-20' disabled={isLoading} type='submit'>

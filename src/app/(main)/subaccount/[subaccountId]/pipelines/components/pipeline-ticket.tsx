@@ -134,7 +134,7 @@ function PipelineTicket({ setAllTickets, ticket, subaccountId, allTickets, index
                       <HoverCard>
                         <HoverCardTrigger asChild>
                           <div className='flex cursor-pointer items-center gap-2 rounded-lg p-2 text-muted-foreground transition-all hover:bg-muted'>
-                            <LinkIcon />
+                            <LinkIcon size={14} />
                             <span className='text-xs font-bold'>CONTACT</span>
                           </div>
                         </HoverCardTrigger>
