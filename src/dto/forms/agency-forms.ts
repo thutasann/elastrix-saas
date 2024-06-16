@@ -1,3 +1,4 @@
+import { currencyNumberRegex } from '@/lib/constants'
 import * as z from 'zod'
 
 /**
@@ -55,4 +56,12 @@ export const InvitationUserDataSchema = z.object({
 export const UploadMediaSchema = z.object({
   link: z.string().min(1, { message: 'Media File is required' }),
   name: z.string().min(1, { message: 'Name is required' }),
+})
+
+/**
+ * Contact User Form
+ */
+export const ContactUserFormSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email(),
 })

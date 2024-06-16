@@ -5,7 +5,7 @@ import {
 } from '@/lib/server-actions/queries/subaccount-queries'
 import { getUserPermissions } from '@/lib/server-actions/queries/subaccount-queries'
 import { _getTicketsWithAllRelations } from '@/lib/server-actions/queries/ticket-queries'
-import { Notification, Prisma, Role } from '@prisma/client'
+import { Contact, Notification, Prisma, Role, SubAccount, Ticket } from '@prisma/client'
 import { Stripe } from 'stripe'
 
 /** Ticket Deails with All Relations Props */
@@ -46,3 +46,8 @@ export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>
 
 /** Create media files props */
 export type CreateMediaType = Prisma.MediaCreateWithoutSubaccountInput
+
+/** SubAccount with Contact Props */
+export type SubAccountWithContacts = SubAccount & {
+  Contact: (Contact & { Ticket: Ticket[] })[]
+}
