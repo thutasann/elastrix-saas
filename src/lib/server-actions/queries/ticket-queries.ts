@@ -125,7 +125,7 @@ export const updateLanesOrder = async (lanes: Lane[]) => {
 /** update tickets order */
 export const updateTicketsOrder = async (tickets: Ticket[]) => {
   try {
-    const updateTrans = tickets.map((ticket) =>
+    const updateTrans = tickets?.map((ticket) =>
       db.ticket.update({
         where: {
           id: ticket.id,
@@ -242,6 +242,44 @@ export const createTicket = async (ticket: Prisma.TicketUncheckedCreateInput, ta
 
   try {
     const response = await db.ticket.create({
+      data: {
+        ...ticket,
+        order,
+        TagIds: tags.map((tag) => tag.id),
+      },
+      include: {
+        Assigned: true,
+        Customer: true,
+        Tags: true,
+        Lane: true,
+      },
+    })
+
+    return response
+  } catch (error) {
+    console.log('create ticket error: ', error)
+  }
+}
+
+/** update ticket */
+export const updateTicket = async (ticket: Prisma.TicketUncheckedCreateInput, tags: Tag[], ticketId: string) => {
+  let order: number
+  if (!ticket.order) {
+    const tickets = await db.ticket.findMany({
+      where: {
+        laneId: ticket.laneId,
+      },
+    })
+    order = tickets.length
+  } else {
+    order = ticket.order
+  }
+
+  try {
+    const response = await db.ticket.update({
+      where: {
+        id: ticketId,
+      },
       data: {
         ...ticket,
         order,

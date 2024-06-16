@@ -24,7 +24,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { cn } from '@/lib/utils'
 import { CustomLoader } from '@/components/molecules/loader'
 import { useToast } from '@/components/ui/use-toast'
-import { createTicket } from '@/lib/server-actions/queries/ticket-queries'
+import { createTicket, updateTicket } from '@/lib/server-actions/queries/ticket-queries'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 
 interface ITicketForm {
@@ -89,17 +89,29 @@ function TicketForm({ laneId, subaccountId, getNewTicket }: ITicketForm) {
   const onSubmit = async (values: z.infer<typeof TicketFormSchema>) => {
     if (!laneId) return
     try {
-      console.log('tags', tags)
-      const response = await createTicket(
-        {
-          ...values,
-          laneId,
-          // id: defaultData.ticket?.id,
-          assignedUserId: assignedTo,
-          ...(contact ? { customerId: contact } : {}),
-        },
-        tags,
-      )
+      let response
+      if (defaultData?.ticket?.id) {
+        response = await updateTicket(
+          {
+            ...values,
+            laneId,
+            assignedUserId: assignedTo,
+            ...(contact ? { customerId: contact } : {}),
+          },
+          tags,
+          defaultData?.ticket?.id,
+        )
+      } else {
+        response = await createTicket(
+          {
+            ...values,
+            laneId,
+            assignedUserId: assignedTo,
+            ...(contact ? { customerId: contact } : {}),
+          },
+          tags,
+        )
+      }
 
       toast({
         title: 'Success',

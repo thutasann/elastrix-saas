@@ -74,29 +74,29 @@ function Pipelineview({
 
       case 'ticket': {
         let newLanes = [...allLanes]
-        const originalLane = newLanes.find((lane) => lane.id, source.droppableId)
-
+        const originaLane = newLanes.find((lane) => lane.id === source.droppableId)
         const destinationLane = newLanes.find((lane) => lane.id === destination.droppableId)
 
-        if (!originalLane || !destinationLane) return
+        if (!originaLane || !destinationLane) {
+          return
+        }
 
         if (source.droppableId === destination.droppableId) {
-          const newOrderedTickets = [...originalLane.Tickets]
+          const newOrderedTickets = [...originaLane.Tickets]
             .toSpliced(source.index, 1)
-            .toSpliced(destination.index, 0, originalLane.Tickets[source.index])
+            .toSpliced(destination.index, 0, originaLane.Tickets[source.index])
             .map((item, idx) => {
               return { ...item, order: idx }
             })
-
-          originalLane.Tickets = newOrderedTickets
+          originaLane.Tickets = newOrderedTickets
           setAllLanes(newLanes)
           updateTicketsOrder(newOrderedTickets)
           router.refresh()
         } else {
-          const [currentTicket] = originalLane.Tickets.splice(source.index, 1)
+          const [currentTicket] = originaLane.Tickets.splice(source.index, 1)
 
-          originalLane.Tickets.forEach((ticket, index) => {
-            ticket.order = index
+          originaLane.Tickets.forEach((ticket, idx) => {
+            ticket.order = idx
           })
 
           destinationLane.Tickets.splice(destination.index, 0, {
@@ -104,16 +104,11 @@ function Pipelineview({
             laneId: destination.droppableId,
           })
 
-          destinationLane.Tickets.forEach((ticket, index) => {
-            ticket.order = index
+          destinationLane.Tickets.forEach((ticket, idx) => {
+            ticket.order = idx
           })
-
           setAllLanes(newLanes)
-          updateTicketsOrder({
-            ...destinationLane.Tickets,
-            ...originalLane.Tickets,
-          })
-
+          updateTicketsOrder([...destinationLane.Tickets, ...originaLane.Tickets])
           router.refresh()
         }
       }

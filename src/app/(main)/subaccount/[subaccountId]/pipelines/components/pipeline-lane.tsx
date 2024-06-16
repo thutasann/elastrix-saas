@@ -132,7 +132,7 @@ function PipelineLane({
                       <div className={cn('h-4 w-4 rounded-full')} style={{ background: randomColor }} />
                       <span className='text-sm font-bold'>{laneDetails.name}</span>
                     </div>
-                    <div className='mt-2 flex flex-row items-center'>
+                    <div className='mt-2 flex w-full flex-row items-center justify-between'>
                       <Badge className='bg-white text-black'>{amt.format(laneAmt)}</Badge>
                       <DropdownMenuTrigger>
                         <MoreVertical className='cursor-pointer text-muted-foreground' />
@@ -144,9 +144,9 @@ function PipelineLane({
                   <Droppable droppableId={laneDetails.id} key={laneDetails.id} type='ticket'>
                     {(provided) => {
                       return (
-                        <div className='max-h-[700px] overflow-auto pt-12'>
+                        <div className='mt-24 max-h-[700px] overflow-auto'>
                           <div {...provided.droppableProps} ref={provided.innerRef} className='mt-2'>
-                            {tickets.map((ticket, index) => {
+                            {tickets?.map((ticket, index) => {
                               return (
                                 <PipelineTicket
                                   allTickets={allTickets}
