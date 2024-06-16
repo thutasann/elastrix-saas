@@ -44,3 +44,7 @@ npx prisma format
 ```bash
 npx prisma studio
 ```
+
+## Stirpe
+
+- https://docs.stripe.com/connect/testing#using-oauth
