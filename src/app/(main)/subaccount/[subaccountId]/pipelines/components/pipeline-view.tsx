@@ -33,7 +33,6 @@ function Pipelineview({
   const { setOpen } = useModal()
   const ticketsFromAllLanes: TicketAndTags[] = []
   const [allLanes, setAllLanes] = useState<LaneDetail[]>([])
-  console.log('allLanes', allLanes)
   const [allTickets, setAllTickets] = useState<TicketAndTags[]>(ticketsFromAllLanes)
 
   lanes?.forEach((lane) => {

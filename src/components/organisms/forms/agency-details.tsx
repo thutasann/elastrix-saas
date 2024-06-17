@@ -38,6 +38,7 @@ import { CustomLoader } from '@/components/molecules/loader'
 import { generateObjectId } from '@/lib/utils'
 
 interface IAgencyDetails {
+  /** agency data */
   data?: Partial<Agency>
   /** check form is create form or edit form  */
   update?: boolean
@@ -81,7 +82,7 @@ function AgencyDetails({ data, update }: IAgencyDetails) {
       let custId: string = ''
 
       if (!data?.id) {
-        const payloadData = {
+        const bodyData = {
           email: values.companyEmail,
           name: values.name,
           shipping: {
@@ -102,70 +103,76 @@ function AgencyDetails({ data, update }: IAgencyDetails) {
             state: values.zipCode,
           },
         }
-      }
 
-      // init user
-      newUserData = await initUser({
-        role: 'AGENCY_OWNER',
-      })
-
-      if (!data?.customerId) {
-        let response
-        const payload = update
-          ? ({
-              customerId: data?.customerId || custId || '',
-              address: values.address,
-              agencyLogo: values.agencyLogo,
-              city: values.city,
-              companyPhone: values.companyPhone,
-              country: values.country,
-              name: values.name,
-              state: values.state,
-              whiteLabel: values.whiteLabel,
-              zipCode: values.zipCode,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              companyEmail: values.companyEmail,
-              connectAccountId: '',
-              goal: 5,
-            } as Agency)
-          : ({
-              id: data?.id ? data.id : generateObjectId(),
-              customerId: data?.customerId || custId || '',
-              address: values.address,
-              agencyLogo: values.agencyLogo,
-              city: values.city,
-              companyPhone: values.companyPhone,
-              country: values.country,
-              name: values.name,
-              state: values.state,
-              whiteLabel: values.whiteLabel,
-              zipCode: values.zipCode,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-              companyEmail: values.companyEmail,
-              connectAccountId: '',
-              goal: 5,
-            } as Agency)
-
-        if (update) {
-          response = await upsertAgency(payload, data?.id!)
-        } else {
-          response = await createAgency(payload)
-        }
-
-        console.log('response', response)
-
-        toast({
-          variant: response ? 'default' : 'destructive',
-          title: !response ? "Can't save agency info" : 'Saved Agency',
+        const customerResponse = await fetch(`/api/stripe/create-customer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(bodyData),
         })
 
-        if (data?.id) return router.refresh()
+        const customerData: { customerId: string } = await customerResponse.json()
+        console.log('stripe customerData', customerData)
+        custId = customerData.customerId
+      }
 
-        if (response) {
-          return router.refresh()
-        }
+      newUserData = await initUser({ role: 'AGENCY_OWNER' })
+      if (!data?.customerId && !custId) return
+
+      let response
+      const payload = update
+        ? ({
+            customerId: data?.customerId || custId || '',
+            address: values.address,
+            agencyLogo: values.agencyLogo,
+            city: values.city,
+            companyPhone: values.companyPhone,
+            country: values.country,
+            name: values.name,
+            state: values.state,
+            whiteLabel: values.whiteLabel,
+            zipCode: values.zipCode,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            companyEmail: values.companyEmail,
+            connectAccountId: '',
+            goal: 5,
+          } as Agency)
+        : ({
+            id: data?.id ? data.id : generateObjectId(),
+            customerId: data?.customerId || custId || '',
+            address: values.address,
+            agencyLogo: values.agencyLogo,
+            city: values.city,
+            companyPhone: values.companyPhone,
+            country: values.country,
+            name: values.name,
+            state: values.state,
+            whiteLabel: values.whiteLabel,
+            zipCode: values.zipCode,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            companyEmail: values.companyEmail,
+            connectAccountId: '',
+            goal: 5,
+          } as Agency)
+
+      if (update) {
+        response = await upsertAgency(payload, data?.id!)
+      } else {
+        response = await createAgency(payload)
+      }
+
+      toast({
+        variant: response ? 'default' : 'destructive',
+        title: !response ? "Can't save agency info" : 'Saved Agency',
+      })
+
+      if (data?.id) return router.refresh()
+
+      if (response) {
+        return router.refresh()
       }
     } catch (error) {
       console.log('create agency error: ', error)

@@ -1,3 +1,5 @@
+import Stripe from 'stripe'
+
 export interface ICreateCheckoutSessionRequest {
   subAccountConnectAccId: string
   prices: {
@@ -31,3 +33,6 @@ export interface ICreateSubscription {
   customerId: string
   priceId: string
 }
+
+/** Stripe Prices List */
+export type PricesList = Stripe.ApiList<Stripe.Price>

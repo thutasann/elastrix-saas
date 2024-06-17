@@ -62,7 +62,6 @@ function PipelineLane({
   })
 
   const laneAmt = useMemo(() => {
-    console.log(tickets)
     return tickets.reduce((sum, ticket) => sum + (Number(ticket?.value) || 0), 0)
   }, [tickets])
 
