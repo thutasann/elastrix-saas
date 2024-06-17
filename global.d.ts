@@ -8,5 +8,7 @@ declare namespace NodeJS {
     NEXT_PUBLIC_PLATFORM_ONETIME_FEE: number
     NEXT_PUBLIC_PLATFORM_AGENY_PERCENT: number
     NEXT_ELASTRIX_PRODUCT_ID: string
+    STRIPE_WEBHOOK_SECRET: string
+    STRIPE_WEBHOOK_SECRET_LIVE: string
   }
 }
