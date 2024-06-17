@@ -15,6 +15,7 @@ interface IBillingPage {
 async function BillingPage({ params }: IBillingPage) {
   const addOns = await stripe.products.list({
     ids: addOnProducts.map((product) => product.id),
+    expand: ['data.default_price'],
   })
 
   const agencySubscription = await db.agency.findUnique({
@@ -28,11 +29,11 @@ async function BillingPage({ params }: IBillingPage) {
   })
 
   const prices = await stripe.prices.list({
-    product: process.env.NEXT_ELASTRIX_PRODUCT_ID,
+    product: process.env.NEXT_PLURA_PRODUCT_ID,
     active: true,
   })
 
-  const currentPlanDetails = pricingCards.find((c) => c.priceId == agencySubscription?.Subscription?.priceId)
+  const currentPlanDetails = pricingCards.find((c) => c.priceId === agencySubscription?.Subscription?.priceId)
 
   const charges = await stripe.charges.list({
     limit: 50,
@@ -88,6 +89,7 @@ async function BillingPage({ params }: IBillingPage) {
           }
           title={agencySubscription?.Subscription?.active === true ? currentPlanDetails?.title || 'Starter' : 'Starter'}
         />
+
         {addOns.data.map((addOn) => (
           <PricingCard
             planExists={agencySubscription?.Subscription?.active === true}

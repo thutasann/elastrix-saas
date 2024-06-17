@@ -65,8 +65,8 @@ export async function POST(req: Request) {
         clientSecret: subscription.latest_invoice.payment_intent.client_secret,
       })
     }
-  } catch (error) {
-    console.log('🔴 create Subscription error : ', error)
+  } catch (error: any) {
+    console.log('🔴 create Subscription error : ', error.message)
     return new NextResponse('Internal Server Error', {
       status: 500,
     })

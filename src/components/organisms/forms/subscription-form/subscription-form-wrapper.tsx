@@ -20,15 +20,14 @@ interface ISubscriptionFormWrapper {
 }
 
 function SubscriptionFormWrapper({ customerId, planExists }: ISubscriptionFormWrapper) {
-  const { toast } = useToast()
   const { data, setClose } = useModal()
-  console.log('data', data)
+  const { toast } = useToast()
   const router = useRouter()
   const [selectedPriceId, setSelectedPriceId] = useState<Plan | ''>(data?.plans?.defaultPriceId || '')
-  const [subscription, setSubscription] = useState({
-    subscriptionId: '',
-    clientSecret: '',
-  })
+  const [subscription, setSubscription] = useState<{
+    subscriptionId: string
+    clientSecret: string
+  }>({ subscriptionId: '', clientSecret: '' })
 
   const options: StripeElementsOptions = useMemo(
     () => ({
@@ -53,14 +52,11 @@ function SubscriptionFormWrapper({ customerId, planExists }: ISubscriptionFormWr
           priceId: selectedPriceId,
         }),
       })
-
       const subscriptionResponseData = await subscriptionResponse.json()
-
       setSubscription({
         clientSecret: subscriptionResponseData.clientSecret,
         subscriptionId: subscriptionResponseData.subscriptionId,
       })
-
       if (planExists) {
         toast({
           title: 'Success',
@@ -72,7 +68,7 @@ function SubscriptionFormWrapper({ customerId, planExists }: ISubscriptionFormWr
     }
     createSecret()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, selectedPriceId, customerId, planExists])
+  }, [data, selectedPriceId, customerId])
 
   return (
     <div className='border-none transition-all'>
