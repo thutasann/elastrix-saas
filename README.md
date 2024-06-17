@@ -45,6 +45,28 @@ npx prisma format
 npx prisma studio
 ```
 
+### Prisma DB Push
+
+```bash
+npx prisma db push
+```
+
 ## Stirpe
 
 - https://docs.stripe.com/connect/testing#using-oauth
+
+### Stripe Webhook
+
+```bash
+stripe login
+```
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+### Test Trigger Webhook
+
+```bash
+stripe trigger payment_intent.succeeded
+```
