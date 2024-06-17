@@ -30,6 +30,7 @@ import {
   ClipboardIcon,
 } from 'lucide-react'
 
+/** pricing cards that is related to stripe */
 export const pricingCards = [
   {
     title: 'Starter',
@@ -47,7 +48,7 @@ export const pricingCards = [
     duration: 'month',
     highlight: 'Key features',
     features: ['Rebilling', '24/7 Support team'],
-    priceId: 'price_1OYxkqFj9oKEERu1KfJGWxgN',
+    priceId: 'price_1PSYAsBKw5M31KCumiU28Edd',
   },
   {
     title: 'Basic',
@@ -56,12 +57,14 @@ export const pricingCards = [
     duration: 'month',
     highlight: 'Everything in Starter, plus',
     features: ['Unlimited Sub accounts', 'Unlimited Team members'],
-    priceId: 'price_1OYxkqFj9oKEERu1NbKUxXxN',
+    priceId: 'price_1PSYAsBKw5M31KCunA3r1S2H',
   },
 ]
 
-export const addOnProducts = [{ title: 'Priority Support', id: 'prod_PNjJAE2EpP16pn' }]
+/** add on products */
+export const addOnProducts = [{ title: 'Priority Support', id: 'prod_QJAVju4H6s7WI2' }]
 
+/** icons */
 export const icons = [
   {
     value: 'chart',
@@ -210,6 +213,7 @@ export const icons = [
   },
 ]
 
+/** defualt styles */
 export const defaultStyles: React.CSSProperties = {
   backgroundPosition: 'center',
   objectFit: 'cover',
@@ -218,4 +222,5 @@ export const defaultStyles: React.CSSProperties = {
   opacity: '100%',
 }
 
+/** currency number regex */
 export const currencyNumberRegex = /^\d+(\.\d{1,2})?$/
