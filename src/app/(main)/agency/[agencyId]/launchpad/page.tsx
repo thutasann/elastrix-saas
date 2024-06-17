@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { db } from '@/lib/db'
+import { getStripeOAuthLink, stripe } from '@/lib/stripe'
 import { CheckCircleIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -34,6 +35,31 @@ async function LaunchPadPage({ params, searchParams }: ILaunchPage) {
     agencyDetails.state &&
     agencyDetails.zipCode
 
+  const stripeOAuthLink = getStripeOAuthLink('agency', `launchpad___${agencyDetails.id}`)
+
+  let connectedStripeAccount = false
+
+  if (searchParams.code) {
+    if (!agencyDetails.connectAccountId) {
+      try {
+        const response = await stripe.oauth.token({
+          grant_type: 'authorization_code',
+          code: searchParams.code,
+        })
+        console.log('stripe_user_id', response.stripe_user_id)
+        await db.agency.update({
+          where: { id: params.agencyId },
+          data: {
+            connectAccountId: response.stripe_user_id,
+          },
+        })
+        connectedStripeAccount = true
+      } catch (error) {
+        console.log('🔴 Could not connect stripe account')
+      }
+    }
+  }
+
   return (
     <div className='flex flex-col items-center justify-center'>
       <div className='h-full w-full max-w-[800px]'>
@@ -54,7 +80,7 @@ async function LaunchPadPage({ params, searchParams }: ILaunchPage) {
                 />
                 <p> Save the website as a shortcut on your mobile device</p>
               </div>
-              <Button>Start</Button>
+              <Button disabled>Start</Button>
             </div>
             <div className='flex w-full items-center justify-between gap-2 rounded-lg border p-4'>
               <div className='flex flex-col gap-4 md:!flex-row md:items-center'>
@@ -67,10 +93,10 @@ async function LaunchPadPage({ params, searchParams }: ILaunchPage) {
                 />
                 <p>Connect your stripe account to accept payments and see your dashboard.</p>
               </div>
-              {agencyDetails.connectAccountId ? (
+              {agencyDetails.connectAccountId || connectedStripeAccount ? (
                 <CheckCircleIcon size={50} className='flex-shrink-0 p-2 text-primary' />
               ) : (
-                <Link href='' className='rounded-md bg-primary px-4 py-2 text-white'>
+                <Link href={stripeOAuthLink} className='rounded-md bg-primary px-4 py-2 text-white'>
                   Start
                 </Link>
               )}

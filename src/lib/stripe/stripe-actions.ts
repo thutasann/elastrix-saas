@@ -32,14 +32,14 @@ export const subscriptionCreated = async (subscription: Stripe.Subscription, cus
       plan: subscription.plan.id,
     }
 
-    await db.subscription.upsert({
+    const response = await db.subscription.upsert({
       where: {
         agencyId: agency.id,
       },
       create: data,
       update: data,
     })
-
+    console.log('Created Subscription response', response)
     Logger.info(`🟢 Created Subscription for ${subscription.id}`)
   } catch (error) {
     console.log('subscription created error : ', error)
