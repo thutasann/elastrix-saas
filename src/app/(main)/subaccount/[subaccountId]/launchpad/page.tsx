@@ -2,6 +2,7 @@ import BlurPage from '@/components/organisms/agency/blur-page'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { db } from '@/lib/db'
+import { getStripeOAuthLink, stripe } from '@/lib/stripe'
 import { CheckCircleIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -34,12 +35,22 @@ async function SubAccountLaunchPadPage({ params, searchParams }: ISubAccountLaun
     subaccountDetails.name &&
     subaccountDetails.state
 
+  const stripeOAuthLink = getStripeOAuthLink('subaccount', `launchpad___${subaccountDetails.id}`)
+
   let connectedStripeAccount = false
 
   if (searchParams.code) {
     if (!subaccountDetails.connectAccountId) {
       try {
-        // TODO: stripe
+        const response = await stripe.oauth.token({
+          grant_type: 'authorization_code',
+          code: searchParams.code,
+        })
+        await db.subAccount.update({
+          where: { id: params.subaccountId },
+          data: { connectAccountId: response.stripe_user_id },
+        })
+        connectedStripeAccount = true
       } catch (error) {
         console.log('🔴 Could not connect stripe account', error)
       }
@@ -67,7 +78,7 @@ async function SubAccountLaunchPadPage({ params, searchParams }: ISubAccountLaun
                   />
                   <p>Save the website as a shortcut on your mobile devide</p>
                 </div>
-                <Button>Start</Button>
+                <Button disabled>Start</Button>
               </div>
               <div className='flex h-20 w-full items-center justify-between rounded-lg border p-4'>
                 <div className='flex items-center gap-4'>
@@ -83,7 +94,7 @@ async function SubAccountLaunchPadPage({ params, searchParams }: ISubAccountLaun
                 {subaccountDetails.connectAccountId || connectedStripeAccount ? (
                   <CheckCircleIcon size={50} className='flex-shrink-0 p-2 text-primary' />
                 ) : (
-                  <Link className='rounded-md bg-primary px-4 py-2 text-white' href=''>
+                  <Link className='rounded-md bg-primary px-4 py-2 text-white' href={stripeOAuthLink}>
                     Start
                   </Link>
                 )}
