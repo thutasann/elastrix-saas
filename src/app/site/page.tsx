@@ -2,11 +2,17 @@ import { Fragment } from 'react'
 import Image from 'next/image'
 import { pricingCards } from '@/lib/constants'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import clsx from 'clsx'
 import { Check } from 'lucide-react'
 import Link from 'next/link'
+import { stripe } from '@/lib/stripe'
+import { cn } from '@/lib/utils'
 
-export default function Home() {
+export default async function Home() {
+  const prices = await stripe.prices.list({
+    product: process.env.NEXT_ELASTRIX_PRODUCT_ID,
+    active: true,
+  })
+
   return (
     <Fragment>
       <section className='relative mt-[-70px] flex h-full w-full flex-col items-center justify-center md:pt-44'>
@@ -33,34 +39,33 @@ export default function Home() {
           {" you're"} not ready to commit you can get started for free.
         </p>
         <div className='my-6 flex flex-wrap justify-center gap-4'>
-          {pricingCards.map((card) => (
-            //WIP: Wire up free product from stripe
+          {prices.data.map((card) => (
             <Card
-              key={card.priceId}
-              className={clsx('flex w-[300px] flex-col justify-between', {
-                'border-2 border-primary': card.title === 'Unlimited Saas',
+              key={card.nickname}
+              className={cn('flex w-[300px] flex-col justify-between', {
+                'border-2 border-primary': card.nickname === 'Unlimited Saas',
               })}
             >
               <CardHeader>
                 <CardTitle
-                  className={clsx('', {
-                    'text-muted-foreground': card.title !== 'Unlimited Saas',
+                  className={cn('', {
+                    'text-muted-foreground': card.nickname !== 'Unlimited Saas',
                   })}
                 >
-                  {card.title}
+                  {card.nickname}
                 </CardTitle>
-                <CardDescription>{pricingCards.find((c) => c.title === card.title)?.description}</CardDescription>
+                <CardDescription>{pricingCards.find((c) => c.title === card.nickname)?.description}</CardDescription>
               </CardHeader>
               <CardContent>
-                <span className='text-4xl font-bold'>{card.price}</span>
+                <span className='text-4xl font-bold'>{card.unit_amount && card.unit_amount / 100}</span>
                 <span className='text-muted-foreground'>
-                  <span>/ {card.duration}</span>
+                  <span>/ {card.recurring?.interval}</span>
                 </span>
               </CardContent>
               <CardFooter className='flex flex-col items-start gap-4'>
                 <div>
                   {pricingCards
-                    .find((c) => c.title === card.title)
+                    .find((c) => c.title === card.nickname)
                     ?.features.map((feature) => (
                       <div key={feature} className='flex gap-2'>
                         <Check />
@@ -69,9 +74,9 @@ export default function Home() {
                     ))}
                 </div>
                 <Link
-                  href={`/agency?plan=${card.priceId}`}
-                  className={clsx('w-full rounded-md bg-primary p-2 text-center', {
-                    '!bg-muted-foreground': card.title !== 'Unlimited Saas',
+                  href={`/agency?plan=${card.id}`}
+                  className={cn('w-full rounded-md bg-primary p-2 text-center', {
+                    'bg-muted-foreground': card.nickname !== 'Unlimited Saas',
                   })}
                 >
                   Get Started
@@ -79,6 +84,42 @@ export default function Home() {
               </CardFooter>
             </Card>
           ))}
+          <Card className={cn('flex w-[300px] flex-col justify-between')}>
+            <CardHeader>
+              <CardTitle
+                className={cn({
+                  'text-muted-foreground': true,
+                })}
+              >
+                {pricingCards[0].title}
+              </CardTitle>
+              <CardDescription>{pricingCards[0].description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <span className='text-4xl font-bold'>$0</span>
+              <span>/ month</span>
+            </CardContent>
+            <CardFooter className='flex flex-col items-start gap-4'>
+              <div>
+                {pricingCards
+                  .find((c) => c.title === 'Starter')
+                  ?.features.map((feature) => (
+                    <div key={feature} className='flex gap-2'>
+                      <Check />
+                      <p>{feature}</p>
+                    </div>
+                  ))}
+              </div>
+              <Link
+                href='/agency'
+                className={cn('w-full rounded-md bg-primary p-2 text-center', {
+                  '!bg-muted-foreground': true,
+                })}
+              >
+                Get Started
+              </Link>
+            </CardFooter>
+          </Card>
         </div>
       </section>
     </Fragment>

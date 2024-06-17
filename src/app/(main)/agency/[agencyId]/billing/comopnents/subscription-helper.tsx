@@ -32,7 +32,8 @@ function SubscriptionHelper({ prices, customerId, planExists }: ISubscriptionHel
         }),
       )
     }
-  }, [customerId, plan, planExists, prices, setOpen])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan])
 
   return <div>SubscriptionHelper</div>
 }
