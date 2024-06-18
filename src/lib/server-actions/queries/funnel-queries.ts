@@ -6,6 +6,23 @@ import { Logger } from '@/lib/logger'
 import { generateObjectId } from '@/lib/utils'
 import { z } from 'zod'
 
+/** create funnel */
+export const createFunnel = async (
+  subaccountId: string,
+  funnel: z.infer<typeof CreateFunnelFormSchema> & {
+    liveProducts: string
+  },
+) => {
+  const response = await db.funnel.create({
+    data: {
+      ...funnel,
+      subAccountId: subaccountId,
+    },
+  })
+
+  return response
+}
+
 /** upsert funnel */
 export const upsertFunnel = async (
   subaccountId: string,

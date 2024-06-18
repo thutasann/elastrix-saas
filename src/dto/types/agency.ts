@@ -1,3 +1,4 @@
+import { getFunnels } from '@/lib/server-actions/queries/funnel-queries'
 import {
   getAuthUserDetails,
   getMedia,
@@ -51,3 +52,6 @@ export type CreateMediaType = Prisma.MediaCreateWithoutSubaccountInput
 export type SubAccountWithContacts = SubAccount & {
   Contact: (Contact & { Ticket: Ticket[] })[]
 }
+
+/** Funnels for Sub account Props */
+export type FunnelsForSubAccount = Prisma.PromiseReturnType<typeof getFunnels>[0]
