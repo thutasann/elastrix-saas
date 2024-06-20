@@ -26,6 +26,7 @@ interface IFunnelForm {
 }
 
 function FunnelForm({ defaultData, subAccountId }: IFunnelForm) {
+  console.log('defaultData', defaultData)
   const { setClose } = useModal()
   const { toast } = useToast()
   const router = useRouter()
@@ -53,7 +54,12 @@ function FunnelForm({ defaultData, subAccountId }: IFunnelForm) {
 
   const onSubmit = async (values: z.infer<typeof CreateFunnelFormSchema>) => {
     if (!subAccountId) return
-    const response = await createFunnel(subAccountId, { ...values, liveProducts: defaultData?.liveProducts || '[]' })
+
+    const response = !defaultData
+      ? // @ts-ignore
+        await createFunnel(subAccountId, { ...values, liveProducts: defaultData?.liveProducts || '[]' })
+      : await upsertFunnel(subAccountId, { ...values, liveProducts: defaultData?.liveProducts || '[]' }, defaultData.id)
+
     await saveActivityLogsNotification({
       agencyId: undefined,
       description: `Update funnel | ${response.name}`,

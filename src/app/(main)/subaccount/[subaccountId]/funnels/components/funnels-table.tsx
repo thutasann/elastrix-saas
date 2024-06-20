@@ -2,11 +2,12 @@
 
 import React from 'react'
 import { useModal } from '@/providers/modal-provider'
-import { ColumnDef, getCoreRowModel, getFilteredRowModel, useReactTable } from '@tanstack/react-table'
+import { ColumnDef, flexRender, getCoreRowModel, getFilteredRowModel, useReactTable } from '@tanstack/react-table'
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import CustomModal from '@/components/molecules/modals/cutsom-modal'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface IFunnelsTable<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -34,6 +35,7 @@ function FunnelsTable<TData, TValue>({
 
   return (
     <>
+      {/* Search */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-2 py-4'>
           <Search />
@@ -60,6 +62,42 @@ function FunnelsTable<TData, TValue>({
         >
           {actionButtonText}
         </Button>
+      </div>
+
+      {/* Table */}
+      <div className='rounded-lg border bg-background'>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className='h-24 text-center'>
+                  No Results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
     </>
   )
