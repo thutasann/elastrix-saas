@@ -5,12 +5,16 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { FunnelsForSubAccount } from '@/dto/types/agency'
 import { useModal } from '@/providers/modal-provider'
 import { FunnelPage } from '@prisma/client'
-import { Check } from 'lucide-react'
+import { Check, Router } from 'lucide-react'
 import React, { useState } from 'react'
 import { type DropResult, type DragStart, DragDropContext, Droppable } from 'react-beautiful-dnd'
 import FunnelStepCard from './funnel-step-card'
 import { useToast } from '@/components/ui/use-toast'
 import { upsertFunnelPage } from '@/lib/server-actions/queries/funnel-queries'
+import { Button } from '@/components/ui/button'
+import CustomModal from '@/components/molecules/modals/cutsom-modal'
+import FunnelPageForm from '@/components/organisms/forms/funnel-page-form'
+import { useRouter } from 'next/navigation'
 
 interface IFUnnelSteps {
   funnel: FunnelsForSubAccount
@@ -20,6 +24,7 @@ interface IFUnnelSteps {
 }
 
 function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
+  const router = useRouter()
   const { setOpen } = useModal()
   const { toast } = useToast()
   const [clickedPage, setClickedPage] = useState(pages[0])
@@ -49,11 +54,12 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
     setPagesState(newPageOrder)
 
     newPageOrder.forEach(async (page, index) => {
+      console.log('page.id', page.id)
       try {
         await upsertFunnelPage(
           subaccountId,
+          page.id,
           {
-            id: page.id,
             order: index,
             name: page.name,
           },
@@ -75,11 +81,9 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
     <AlertDialog>
       <div className='flex flex-col border-[1px] lg:!flex-row'>
         <aside className='flex flex-[0.3px] flex-col justify-between bg-background p-6'>
+          {/* Funnel Steps */}
           <ScrollArea className='h-full'>
-            <div className='flex items-center gap-4'>
-              <Check />
-              Funnel Steps
-            </div>
+            <div className='flex items-center gap-4 text-xl font-bold'>Funnel Steps</div>
             {pagesState.length ? (
               <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
                 <Droppable droppableId='funnels' direction='vertical' key='funnels'>
@@ -105,6 +109,23 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
               <div className='py-6 text-center text-muted-foreground'>No Pages</div>
             )}
           </ScrollArea>
+
+          {/* Cretae Funnel Page */}
+          <Button
+            className='mt-4 w-full'
+            onClick={() => {
+              setOpen(
+                <CustomModal
+                  title='Create or Update a Funnel Page'
+                  subheading='Funnel Pages allow you to create step by step processes for customers to follow'
+                >
+                  <FunnelPageForm subaccountId={subaccountId} funnelId={funnelId} order={pagesState.length} />
+                </CustomModal>,
+              )
+            }}
+          >
+            Create New Steps
+          </Button>
         </aside>
       </div>
     </AlertDialog>

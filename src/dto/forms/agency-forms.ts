@@ -65,3 +65,11 @@ export const ContactUserFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email(),
 })
+
+/**
+ * Funnel Page Form Schema
+ */
+export const FunnelPageFormSchema = z.object({
+  name: z.string().min(1),
+  pathName: z.string().optional(),
+})

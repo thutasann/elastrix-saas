@@ -38,8 +38,7 @@ function FunnelStepCard({ activePage, funnelPage, index }: IFunnelStepCard) {
           >
             <CardContent className='flex flex-row items-center gap-4 p-0'>
               <div className='flex h-14 w-14 items-center justify-center bg-muted'>
-                <Mail />
-                <ArrowDown size={18} className='absolute -bottom-2 text-primary' />
+                <ArrowDown size={18} className='text-primary' />
               </div>
               {funnelPage.name}
             </CardContent>

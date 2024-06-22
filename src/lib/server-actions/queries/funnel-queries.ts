@@ -84,14 +84,41 @@ export const updateFunnelProducts = async (products: string, funnelId: string) =
   return data
 }
 
+/** create funnel page */
+export const createFunnelPage = async (subaccountId: string, funnelPage: UpsertFunnelPage, funnelId: string) => {
+  if (!subaccountId || !funnelId) return
+  const response = await db.funnelPage.create({
+    data: {
+      ...funnelPage,
+      content: funnelPage.content
+        ? funnelPage.content
+        : JSON.stringify([
+            {
+              content: [],
+              id: '__body',
+              name: 'Body',
+              styles: { backgroundColor: 'white' },
+              type: '__body',
+            },
+          ]),
+      funnelId,
+    },
+  })
+  revalidatePath(`/subaccount/${subaccountId}/funnels/${funnelId}`, 'page')
+  return response
+}
+
 /** upsert funnel page */
-export const upsertFunnelPage = async (subaccountId: string, funnelPage: UpsertFunnelPage, funnelId: string) => {
+export const upsertFunnelPage = async (
+  subaccountId: string,
+  pageId: string,
+  funnelPage: UpsertFunnelPage,
+  funnelId: string,
+) => {
   if (!subaccountId || !funnelId) return
   const response = await db.funnelPage.upsert({
-    where: { id: funnelPage.id || '' },
-    update: {
-      ...funnelPage,
-    },
+    where: { id: pageId || '' },
+    update: { ...funnelPage },
     create: {
       ...funnelPage,
       content: funnelPage.content
@@ -108,6 +135,7 @@ export const upsertFunnelPage = async (subaccountId: string, funnelPage: UpsertF
       funnelId,
     },
   })
+
   revalidatePath(`/subaccount/${subaccountId}/funnels/${funnelId}`, 'page')
   return response
 }
