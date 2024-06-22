@@ -13,6 +13,10 @@ import { upsertFunnelPage } from '@/lib/server-actions/queries/funnel-queries'
 import { Button } from '@/components/ui/button'
 import CustomModal from '@/components/molecules/modals/cutsom-modal'
 import FunnelPageForm from '@/components/organisms/forms/funnel-page-form'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ExternalLink, LucideEdit } from 'lucide-react'
+import Link from 'next/link'
+import FunnelPagePlaceholder from '@/components/molecules/icons/funnel-page-placeholder'
 
 interface IFUnnelSteps {
   funnel: FunnelsForSubAccount
@@ -83,7 +87,8 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
   return (
     <AlertDialog>
       <div className='flex flex-col border-[1px] lg:!flex-row'>
-        <aside className='flex flex-[0.3px] flex-col justify-between bg-background p-6'>
+        {/* Funnels */}
+        <aside className='flex flex-[0.3] flex-col justify-between bg-background p-6'>
           {/* Funnel Steps */}
           <ScrollArea className='h-full'>
             <div className='flex items-center gap-4 text-xl font-bold'>Funnel Steps</div>
@@ -127,6 +132,56 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
           >
             Create New Steps
           </Button>
+        </aside>
+
+        <aside className='flex-[0.7] bg-muted p-4'>
+          {!!pages.length ? (
+            <Card className='flex h-full flex-col justify-between'>
+              <CardHeader>
+                <p className='text-sm text-muted-foreground'>Page name</p>
+                <CardTitle>{clickedPage?.name}</CardTitle>
+                <CardDescription className='flex flex-col gap-4'>
+                  <div className='w-full overflow-clip rounded-lg border-2'>
+                    <Link
+                      href={`/subaccount/${subaccountId}/funnels/${funnelId}/editor/${clickedPage?.id}`}
+                      className='group relative'
+                    >
+                      <div className='w-full cursor-pointer group-hover:opacity-30'>
+                        <FunnelPagePlaceholder />
+                      </div>
+                      <LucideEdit
+                        size={50}
+                        className='transofrm absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 !text-muted-foreground opacity-0 transition-all duration-100 group-hover:opacity-100'
+                      />
+                    </Link>
+
+                    <Link
+                      target='_blank'
+                      href={`${process.env.NEXT_PUBLIC_SCHEME}${funnel.subDomainName}.${process.env.NEXT_PUBLIC_DOMAIN}/${clickedPage?.pathName}`}
+                      className='group flex items-center justify-start gap-2 p-2 transition-colors duration-200 hover:text-primary'
+                    >
+                      <ExternalLink size={15} />
+                      <div className='w-64 overflow-hidden overflow-ellipsis'>
+                        {process.env.NEXT_PUBLIC_SCHEME}
+                        {funnel.subDomainName}.{process.env.NEXT_PUBLIC_DOMAIN}/{clickedPage?.pathName}
+                      </div>
+                    </Link>
+                  </div>
+
+                  <FunnelPageForm
+                    subaccountId={subaccountId}
+                    defaultData={clickedPage}
+                    funnelId={funnelId}
+                    order={clickedPage?.order || 0}
+                  />
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            <div className='flex h-[600px] items-center justify-center text-muted-foreground'>
+              Create a page to view page settings.
+            </div>
+          )}
         </aside>
       </div>
     </AlertDialog>

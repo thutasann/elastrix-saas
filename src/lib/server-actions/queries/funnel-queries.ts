@@ -142,6 +142,7 @@ export const upsertFunnelPage = async (
 
 /** delete funnel page */
 export const deleteFunnelPage = async (funnelPageId: string) => {
+  console.log('delete funnelPageId', funnelPageId)
   try {
     const response = await db.funnelPage.delete({
       where: {

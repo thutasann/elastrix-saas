@@ -10,5 +10,6 @@ declare namespace NodeJS {
     NEXT_ELASTRIX_PRODUCT_ID: string
     STRIPE_WEBHOOK_SECRET: string
     STRIPE_WEBHOOK_SECRET_LIVE: string
+    NEXT_PUBLIC_SCHEME: string
   }
 }

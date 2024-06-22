@@ -14,18 +14,24 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CustomLoader } from '@/components/molecules/loader'
 import { CopyPlusIcon, Trash } from 'lucide-react'
-import { createFunnelPage } from '@/lib/server-actions/queries/funnel-queries'
+import {
+  createFunnelPage,
+  deleteFunnelPage,
+  getFunnels,
+  upsertFunnelPage,
+} from '@/lib/server-actions/queries/funnel-queries'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 import { useModal } from '@/providers/modal-provider'
+import { generateObjectId } from '@/lib/utils'
 
 interface IFunnelPageForm {
-  defualtData?: FunnelPage
+  defaultData?: FunnelPage
   subaccountId: string
   funnelId: string
   order: number
 }
 
-function FunnelPageForm({ defualtData, subaccountId, funnelId, order }: IFunnelPageForm) {
+function FunnelPageForm({ defaultData, subaccountId, funnelId, order }: IFunnelPageForm) {
   const router = useRouter()
   const { toast } = useToast()
   const { setClose } = useModal()
@@ -40,13 +46,13 @@ function FunnelPageForm({ defualtData, subaccountId, funnelId, order }: IFunnelP
   })
 
   useEffect(() => {
-    if (defualtData) {
+    if (defaultData) {
       form.reset({
-        name: defualtData.name,
-        pathName: defualtData.pathName,
+        name: defaultData.name,
+        pathName: defaultData.pathName,
       })
     }
-  }, [defualtData, form])
+  }, [defaultData, form])
 
   const onSubmit = async (values: z.infer<typeof FunnelPageFormSchema>) => {
     if (order !== 0 && !values.pathName) {
@@ -56,15 +62,30 @@ function FunnelPageForm({ defualtData, subaccountId, funnelId, order }: IFunnelP
     }
 
     try {
-      const response = await createFunnelPage(
-        subaccountId,
-        {
-          ...values,
-          order: defualtData?.order || order,
-          pathName: values.pathName || '',
-        },
-        funnelId,
-      )
+      let response
+      if (defaultData) {
+        response = await upsertFunnelPage(
+          subaccountId,
+          defaultData.id,
+          {
+            ...values,
+            order: defaultData?.order || order,
+            pathName: values.pathName || '',
+          },
+          funnelId,
+        )
+      } else {
+        response = await createFunnelPage(
+          subaccountId,
+          {
+            ...values,
+            // @ts-ignore
+            order: defaultData?.order || order,
+            pathName: values.pathName || '',
+          },
+          funnelId,
+        )
+      }
 
       await saveActivityLogsNotification({
         agencyId: undefined,
@@ -89,9 +110,43 @@ function FunnelPageForm({ defualtData, subaccountId, funnelId, order }: IFunnelP
     }
   }
 
-  const onDelete = async (id: string) => {}
+  const onDelete = async (id: string) => {
+    const response = await deleteFunnelPage(id)
+    console.log('response', response)
+    if (response) {
+      await saveActivityLogsNotification({
+        agencyId: undefined,
+        description: `Deleted a funnel page | ${response?.name}`,
+        subAccountId: subaccountId,
+      })
+      router.refresh()
+    }
+  }
 
-  const onCopy = async () => {}
+  const onCopy = async () => {
+    if (!defaultData) return
+    const response = await getFunnels(subaccountId)
+    const lastFunnelPage = response?.find((funnel) => funnel.id === funnelId)?.FunnelPages.length
+
+    await createFunnelPage(
+      subaccountId,
+      {
+        ...defaultData,
+        id: generateObjectId(),
+        order: lastFunnelPage ? lastFunnelPage : 0,
+        visits: 0,
+        name: `${defaultData.name} Copy`,
+        pathName: `${defaultData.pathName}copy`,
+        content: defaultData.content,
+      },
+      funnelId,
+    )
+
+    toast({
+      title: 'Success',
+      description: 'Saves Funnel Page Details',
+    })
+  }
 
   return (
     <Card>
@@ -139,19 +194,19 @@ function FunnelPageForm({ defualtData, subaccountId, funnelId, order }: IFunnelP
               </Button>
 
               {/* delete */}
-              {defualtData && defualtData?.id && (
+              {defaultData && defaultData?.id && (
                 <Button
                   variant={'outline'}
                   className='w-22 self-end border-destructive text-destructive hover:bg-destructive'
                   disabled={form.formState.isSubmitting}
-                  onClick={async () => await onDelete(defualtData.id)}
+                  onClick={async () => await onDelete(defaultData.id)}
                 >
                   {form.formState.isSubmitting ? <CustomLoader /> : <Trash />}
                 </Button>
               )}
 
               {/* copy */}
-              {defualtData?.id && (
+              {defaultData?.id && (
                 <Button
                   variant={'outline'}
                   size={'icon'}
