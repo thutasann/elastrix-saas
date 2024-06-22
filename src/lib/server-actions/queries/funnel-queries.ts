@@ -63,7 +63,7 @@ export const getFunnel = async (funnelId: string) => {
     include: {
       FunnelPages: {
         orderBy: {
-          order: 'desc',
+          order: 'asc',
         },
       },
     },

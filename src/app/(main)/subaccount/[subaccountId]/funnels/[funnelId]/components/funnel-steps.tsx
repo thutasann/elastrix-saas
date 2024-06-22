@@ -5,7 +5,6 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { FunnelsForSubAccount } from '@/dto/types/agency'
 import { useModal } from '@/providers/modal-provider'
 import { FunnelPage } from '@prisma/client'
-import { Check, Router } from 'lucide-react'
 import React, { useState } from 'react'
 import { type DropResult, type DragStart, DragDropContext, Droppable } from 'react-beautiful-dnd'
 import FunnelStepCard from './funnel-step-card'
@@ -14,7 +13,6 @@ import { upsertFunnelPage } from '@/lib/server-actions/queries/funnel-queries'
 import { Button } from '@/components/ui/button'
 import CustomModal from '@/components/molecules/modals/cutsom-modal'
 import FunnelPageForm from '@/components/organisms/forms/funnel-page-form'
-import { useRouter } from 'next/navigation'
 
 interface IFUnnelSteps {
   funnel: FunnelsForSubAccount
@@ -24,7 +22,6 @@ interface IFUnnelSteps {
 }
 
 function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
-  const router = useRouter()
   const { setOpen } = useModal()
   const { toast } = useToast()
   const [clickedPage, setClickedPage] = useState(pages[0])
@@ -44,17 +41,13 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
 
     const newPageOrder = [...pagesState]
       .toSpliced(source.index, 1)
-      .toSpliced(destination.index, 0, pages[source.index])
-      .map((page, index) => {
-        return {
-          ...page,
-          order: index,
-        }
+      .toSpliced(destination.index, 0, pagesState[source.index])
+      .map((page, idx) => {
+        return { ...page, order: idx }
       })
     setPagesState(newPageOrder)
 
     newPageOrder.forEach(async (page, index) => {
-      console.log('page.id', page.id)
       try {
         await upsertFunnelPage(
           subaccountId,
@@ -66,7 +59,7 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
           funnelId,
         )
       } catch (error) {
-        console.log('funnel page upsert error : ', error)
+        console.log(error)
         toast({
           variant: 'destructive',
           title: 'Failed',
@@ -74,6 +67,16 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
         })
         return
       }
+    })
+
+    toast({
+      title: 'Success',
+      description: 'Saved page order',
+    })
+
+    toast({
+      title: 'Success',
+      description: 'Saved page order',
     })
   }
 
@@ -87,22 +90,20 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
             {pagesState.length ? (
               <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
                 <Droppable droppableId='funnels' direction='vertical' key='funnels'>
-                  {(provided) => {
-                    return (
-                      <div {...provided.droppableProps} ref={provided.innerRef}>
-                        {pagesState.map((page, index) => (
-                          <div className='relative' key={page.id} onClick={() => setClickedPage(page)}>
-                            <FunnelStepCard
-                              funnelPage={page}
-                              activePage={page.id === clickedPage?.id}
-                              index={index}
-                              key={page.id}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )
-                  }}
+                  {(provided) => (
+                    <div {...provided.droppableProps} ref={provided.innerRef}>
+                      {pagesState.map((page, idx) => (
+                        <div className='relative' key={page.id} onClick={() => setClickedPage(page)}>
+                          <FunnelStepCard
+                            funnelPage={page}
+                            index={idx}
+                            key={page.id}
+                            activePage={page.id === clickedPage?.id}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </Droppable>
               </DragDropContext>
             ) : (
