@@ -17,6 +17,7 @@ interface ISubAccountLaunchPadPage {
 }
 
 async function SubAccountLaunchPadPage({ params, searchParams }: ISubAccountLaunchPadPage) {
+  console.log('searchParams', searchParams)
   const subaccountDetails = await db.subAccount.findUnique({
     where: {
       id: params.subaccountId,

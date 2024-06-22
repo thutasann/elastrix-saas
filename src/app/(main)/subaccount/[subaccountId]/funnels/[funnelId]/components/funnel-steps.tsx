@@ -9,6 +9,8 @@ import { Check } from 'lucide-react'
 import React, { useState } from 'react'
 import { type DropResult, type DragStart, DragDropContext, Droppable } from 'react-beautiful-dnd'
 import FunnelStepCard from './funnel-step-card'
+import { useToast } from '@/components/ui/use-toast'
+import { upsertFunnelPage } from '@/lib/server-actions/queries/funnel-queries'
 
 interface IFUnnelSteps {
   funnel: FunnelsForSubAccount
@@ -18,9 +20,10 @@ interface IFUnnelSteps {
 }
 
 function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
+  const { setOpen } = useModal()
+  const { toast } = useToast()
   const [clickedPage, setClickedPage] = useState(pages[0])
   const [pagesState, setPagesState] = useState(pages)
-  const { setOpen } = useModal()
 
   const onDragStart = (event: DragStart) => {
     const { draggableId } = event
@@ -29,6 +32,43 @@ function FunnelSteps({ funnel, subaccountId, pages, funnelId }: IFUnnelSteps) {
 
   const onDragEnd = (dropResult: DropResult) => {
     const { destination, source } = dropResult
+
+    if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+      return
+    }
+
+    const newPageOrder = [...pagesState]
+      .toSpliced(source.index, 1)
+      .toSpliced(destination.index, 0, pages[source.index])
+      .map((page, index) => {
+        return {
+          ...page,
+          order: index,
+        }
+      })
+    setPagesState(newPageOrder)
+
+    newPageOrder.forEach(async (page, index) => {
+      try {
+        await upsertFunnelPage(
+          subaccountId,
+          {
+            id: page.id,
+            order: index,
+            name: page.name,
+          },
+          funnelId,
+        )
+      } catch (error) {
+        console.log('funnel page upsert error : ', error)
+        toast({
+          variant: 'destructive',
+          title: 'Failed',
+          description: 'Could not save page order',
+        })
+        return
+      }
+    })
   }
 
   return (

@@ -22,6 +22,7 @@ async function FunnelSettings({ subaccountId, defaultData }: IFunnelSettings) {
   if (!subAccountDetails.connectAccountId) return
 
   const products = await getConnectAccountProducts(subAccountDetails.connectAccountId)
+  console.log('products', products, subAccountDetails.connectAccountId)
 
   return (
     <div className='flex flex-col gap-4 xl:!flex-row'>

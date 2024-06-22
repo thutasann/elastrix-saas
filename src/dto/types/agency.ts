@@ -55,3 +55,6 @@ export type SubAccountWithContacts = SubAccount & {
 
 /** Funnels for Sub account Props */
 export type FunnelsForSubAccount = Prisma.PromiseReturnType<typeof getFunnels>[0]
+
+/** Upsert Funnel paeg */
+export type UpsertFunnelPage = Prisma.FunnelPageCreateWithoutFunnelInput
