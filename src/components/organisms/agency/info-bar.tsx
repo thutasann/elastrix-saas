@@ -11,6 +11,7 @@ import { Switch } from '../../ui/switch'
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
 import { ModeToggle } from '@/components/atoms/mode-toggle'
 import { cn } from '@/lib/utils'
+import { useParams } from 'next/navigation'
 
 interface IInfoBar {
   notifications: NotificationWithUser | []
@@ -22,6 +23,7 @@ interface IInfoBar {
 function InfoBar({ notifications, role, className, subAccountId }: IInfoBar) {
   const [allNotifications, setAllNotifications] = useState(notifications)
   const [showAll, setShowAll] = useState(true)
+  const params = useParams()
 
   const handleClick = () => {
     if (!showAll) {
@@ -38,8 +40,9 @@ function InfoBar({ notifications, role, className, subAccountId }: IInfoBar) {
     <>
       <div
         className={cn(
-          'fixed left-0 right-0 top-0 z-[20] flex items-center gap-4 border-b-[1px] p-4 backdrop-blur-md md:left-[300px]',
+          'fixed left-0 right-0 top-0 flex items-center gap-4 border-b-[1px] p-4 backdrop-blur-md md:left-[300px]',
           className,
+          params.funnelPageId ? 'z-0' : 'z-[999]',
         )}
       >
         <div className='ml-auto flex items-center gap-2'>

@@ -2,7 +2,7 @@
 
 import { Input } from '@/components/ui/input'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import { upsertFunnel, upsertFunnelPage } from '@/lib/server-actions/queries/funnel-queries'
+import { upsertFunnelPage } from '@/lib/server-actions/queries/funnel-queries'
 import { cn } from '@/lib/utils'
 import { useEditor } from '@/providers/editor/editor-provider'
 import { FunnelPage } from '@prisma/client'

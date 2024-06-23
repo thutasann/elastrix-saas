@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import React from 'react'
 import FunnelEditorNavigation from './components/funnel-editor-navigation'
 import FunnelEditor from './components/funnel-editor'
+import FunnelEditorSidebar from './components/funnel-editor-sidebar'
 
 interface IEditorFunnelPage {
   params: {
@@ -25,7 +26,7 @@ async function EditorFunnelPage({ params }: IEditorFunnelPage) {
   }
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 top-0 z-[999] overflow-hidden bg-background'>
+    <div className='fixed bottom-0 left-0 right-0 top-0 z-[10] overflow-hidden bg-background'>
       <EditorProvider subaccountId={params.subaccountId} funnelId={params.funnelId} pageDetails={funnelPageDetails}>
         <FunnelEditorNavigation
           funnelId={params.funnelId}
@@ -35,6 +36,7 @@ async function EditorFunnelPage({ params }: IEditorFunnelPage) {
         <div className='flex h-full justify-between'>
           <FunnelEditor funnelPageId={params.funnelPageId} />
         </div>
+        <FunnelEditorSidebar subaccountId={params.subaccountId} />
       </EditorProvider>
     </div>
   )
