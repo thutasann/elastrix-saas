@@ -44,6 +44,9 @@ function EditorProvider({ children, subaccountId, funnelId, pageDetails }: IEdit
   )
 }
 
+/**
+ * useEditor hook for  Editor Provider
+ */
 export function useEditor() {
   const context = useContext(EditorContext)
   if (!context) {

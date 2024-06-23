@@ -116,6 +116,7 @@ export const upsertFunnelPage = async (
   funnelId: string,
 ) => {
   if (!subaccountId || !funnelId) return
+  console.log('funnelPage', funnelPage)
   const response = await db.funnelPage.upsert({
     where: { id: pageId || '' },
     update: { ...funnelPage },
