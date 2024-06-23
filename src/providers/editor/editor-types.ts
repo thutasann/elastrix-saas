@@ -3,6 +3,9 @@ import React from 'react'
 
 export type DeviceTypes = 'Desktop' | 'Mobile' | 'Tablet'
 
+/**
+ * Editor Element Props
+ */
 export type EditorElement = {
   id: string
   styles: React.CSSProperties
@@ -11,6 +14,9 @@ export type EditorElement = {
   content: EditorElement[] | { href?: string; innerText?: string; src?: string }
 }
 
+/**
+ * Editor Type Props
+ */
 export type Editor = {
   liveMode: boolean
   elements: EditorElement[]
@@ -20,18 +26,24 @@ export type Editor = {
   funnelPageId: string
 }
 
+/**
+ * History State Props
+ */
 export type HistoryState = {
   history: Editor[]
   currentIndex: number
 }
 
+/**
+ * Editor State Props
+ */
 export type EditorState = {
   editor: Editor
   history: HistoryState
 }
 
 /**
- * Editor Context Data Types
+ * Editor Context Data Props
  */
 export type EditorcontextData = {
   device: DeviceTypes
@@ -40,6 +52,9 @@ export type EditorcontextData = {
   setDevice: (device: DeviceTypes) => void
 }
 
+/**
+ * Editor Action Props
+ */
 export type EditorAction =
   | {
       type: 'ADD_ELEMENT'
