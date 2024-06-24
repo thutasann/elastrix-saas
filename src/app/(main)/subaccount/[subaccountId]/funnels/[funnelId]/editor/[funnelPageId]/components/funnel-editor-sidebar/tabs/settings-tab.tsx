@@ -33,9 +33,46 @@ import { Slider } from '@/components/ui/slider'
 function SettingsTab() {
   const { state, dispatch } = useEditor()
 
-  const handleOnChanges = (e: any) => {}
+  const handleOnChanges = (e: any) => {
+    const styleSettings = e.target.id
+    let value = e.target.value
+    const styleObject = {
+      [styleSettings]: value,
+    }
+    dispatch({
+      type: 'UPDATE_ELEMENT',
+      payload: {
+        elementDetails: {
+          ...state.editor.selectedElement,
+          styles: {
+            ...state.editor.selectedElement.styles,
+            ...styleObject,
+          },
+        },
+      },
+    })
+  }
 
-  const handleChangeCustomValues = (e: any) => {}
+  const handleChangeCustomValues = (e: any) => {
+    const settingProperty = e.target.id
+    let value = e.target.value
+    const styleObject = {
+      [settingProperty]: value,
+    }
+
+    dispatch({
+      type: 'UPDATE_ELEMENT',
+      payload: {
+        elementDetails: {
+          ...state.editor.selectedElement,
+          content: {
+            ...state.editor.selectedElement.content,
+            ...styleObject,
+          },
+        },
+      },
+    })
+  }
 
   return (
     <Accordion type='multiple' className='h-full' defaultValue={['Typography', 'Dimensions']}>
