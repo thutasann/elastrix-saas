@@ -8,13 +8,13 @@ import { useEditor } from '@/providers/editor/editor-provider'
 import { FunnelPage } from '@prisma/client'
 import { ArrowLeftCircle, EyeIcon, Redo2, Undo2 } from 'lucide-react'
 import Link from 'next/link'
-import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import React, { FocusEventHandler, useEffect } from 'react'
 import DevicesTab from './devices-tab'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
+import { useToast } from '@/components/ui/use-toast'
 
 interface IFunnelEditorNavigation {
   funnelId: string
@@ -24,6 +24,7 @@ interface IFunnelEditorNavigation {
 
 function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: IFunnelEditorNavigation) {
   const router = useRouter()
+  const { toast } = useToast()
   const { state, dispatch } = useEditor()
 
   useEffect(() => {
@@ -46,19 +47,15 @@ function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: I
         },
         funnelId,
       )
-      toast('Success', {
-        description: 'Saved Funnel Page title',
-        style: {
-          zIndex: '9999',
-        },
+      toast({
+        className: 'z-[100000]',
+        title: 'Saved Funnel Page title',
       })
       router.refresh()
     } else {
-      toast('Oppse!', {
-        description: 'You need to have a title!',
-        style: {
-          zIndex: '9999',
-        },
+      toast({
+        className: 'z-[100000]',
+        title: 'You need to have a title!',
       })
       event.target.value = funnelPageDetails.name
     }
@@ -88,6 +85,7 @@ function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: I
   const handleOnSave = async () => {
     const content = JSON.stringify(state.editor.elements)
     const { id, ...funnelPageDetailsWithoutId } = funnelPageDetails
+
     try {
       const response = await upsertFunnelPage(
         subaccountId,
@@ -103,13 +101,16 @@ function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: I
         description: `Updated a funnel page | ${response?.name}`,
         subAccountId: subaccountId,
       })
-      toast('Success', {
-        description: 'Saved Editor',
+      toast({
+        className: 'z-[100000]',
+        title: 'Saved Editor Details',
       })
     } catch (error) {
       console.log('editor save error: ', error)
-      toast('Oppse!', {
-        description: 'Could not save editor',
+      toast({
+        variant: 'destructive',
+        className: 'z-[100000]',
+        title: 'Something went wrong',
       })
     }
   }

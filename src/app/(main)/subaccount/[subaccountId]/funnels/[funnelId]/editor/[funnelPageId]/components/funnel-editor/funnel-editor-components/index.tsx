@@ -15,7 +15,6 @@ interface IRecursiveFunnelEditorComponents {
  * Recursive Funnel Editor Components ⭐️
  */
 function RecursiveFunnelEditorComponents({ element }: IRecursiveFunnelEditorComponents) {
-  console.log('element', element)
   switch (element.type) {
     case 'text':
       return <TextComponent element={element} />

@@ -20,11 +20,8 @@ function Container({ element }: IContainer) {
   const { id, content, styles, type } = element
 
   const handleOnDrop = (e: React.DragEvent, type: string) => {
-    console.log('handleOnDrop')
-
     e.stopPropagation()
     const componentType = e.dataTransfer.getData('componentType') as EditorBtns
-    console.log('componentType', componentType)
 
     switch (componentType) {
       case 'text':
