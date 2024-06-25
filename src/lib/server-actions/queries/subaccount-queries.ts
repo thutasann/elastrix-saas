@@ -364,6 +364,7 @@ export const createTag = async (subaccountId: string, tag: Prisma.TagUncheckedCr
 /** create contact */
 export const createContact = async (contact: Prisma.ContactUncheckedCreateInput) => {
   try {
+    console.log('contact.', contact.name)
     const response = await db.contact.create({
       data: {
         ...contact,

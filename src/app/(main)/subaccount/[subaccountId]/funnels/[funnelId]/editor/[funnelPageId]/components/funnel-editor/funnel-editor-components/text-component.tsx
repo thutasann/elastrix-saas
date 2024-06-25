@@ -49,6 +49,7 @@ function TextComponent({ element }: ITextComponent) {
         </Badge>
       )}
       <span
+        className='text-primary-foreground'
         contentEditable={!state.editor.liveMode}
         onBlur={(e) => {
           const spanElement = e.target as HTMLSpanElement

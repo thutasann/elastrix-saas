@@ -15,7 +15,7 @@ function CheckoutPlaceholder() {
     <div
       draggable
       onDragStart={(e) => handleDragStart(e, 'paymentForm')}
-      className='flex h-12 w-12 items-center justify-center rounded-lg bg-muted'
+      className='flex h-12 w-12 cursor-grab items-center justify-center rounded-lg bg-muted'
     >
       <Image src='/assets/stripelogo.png' height={30} width={30} alt='stripe logo' className='object-cover' />
     </div>

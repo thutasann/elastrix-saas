@@ -73,7 +73,7 @@ function Container({ element }: IContainer) {
             containerId: id,
             elementDetails: {
               content: {
-                src: 'https://www.youtube.com/watch?v=Aq5WXmQQooo',
+                src: 'https://www.youtube.com/embed/dQw4w9WgXcQ?si=3tMdOxV5mBJLVaKC',
               },
               id: generateObjectId(),
               name: 'Video',
