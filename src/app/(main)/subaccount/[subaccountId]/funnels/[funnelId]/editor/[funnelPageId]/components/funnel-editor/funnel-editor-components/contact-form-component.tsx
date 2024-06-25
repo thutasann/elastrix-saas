@@ -1,7 +1,7 @@
 'use client'
 
-import { EditorElement } from '@/providers/editor/editor-types'
 import React from 'react'
+import { EditorElement } from '@/providers/editor/editor-types'
 
 interface IContactFormComponent {
   element: EditorElement
