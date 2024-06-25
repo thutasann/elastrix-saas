@@ -17,6 +17,8 @@ import {
   AlignRight,
   AlignVerticalJustifyCenter,
   AlignVerticalJustifyStart,
+  ChevronsLeftRightIcon,
+  LucideImageDown,
 } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import {
@@ -309,7 +311,113 @@ function SettingsTab() {
                 %
               </small>
             </div>
-            <Slider />
+            <Slider
+              onValueChange={(e) => {
+                handleOnChanges({
+                  target: {
+                    id: 'opacity',
+                    value: `${e[0]}%`,
+                  },
+                })
+              }}
+              defaultValue={[
+                typeof state.editor.selectedElement.styles?.opacity === 'number'
+                  ? state.editor.selectedElement.styles?.opacity
+                  : parseFloat((state.editor.selectedElement.styles?.opacity || '0').replace('%', '')) || 0,
+              ]}
+              max={100}
+              step={1}
+            />
+          </div>
+          <div>
+            <Label className='text-muted-foreground'>Border Radius</Label>
+            <div className='flex items-center justify-end'>
+              <small className=''>
+                {typeof state.editor.selectedElement.styles?.borderRadius === 'number'
+                  ? state.editor.selectedElement.styles?.borderRadius
+                  : parseFloat((state.editor.selectedElement.styles?.borderRadius || '0').replace('px', '')) || 0}
+                px
+              </small>
+            </div>
+            <Slider
+              onValueChange={(e) => {
+                handleOnChanges({
+                  target: {
+                    id: 'borderRadius',
+                    value: `${e[0]}px`,
+                  },
+                })
+              }}
+              defaultValue={[
+                typeof state.editor.selectedElement.styles?.borderRadius === 'number'
+                  ? state.editor.selectedElement.styles?.borderRadius
+                  : parseFloat((state.editor.selectedElement.styles?.borderRadius || '0').replace('%', '')) || 0,
+              ]}
+              max={100}
+              step={1}
+            />
+          </div>
+          <div className='flex flex-col gap-2'>
+            <Label className='text-muted-foreground'>Background Color</Label>
+            <div className='flex overflow-clip rounded-md border-[1px]'>
+              <div
+                className='w-12'
+                style={{
+                  backgroundColor: state.editor.selectedElement.styles.backgroundColor,
+                }}
+              />
+              <Input
+                placeholder='#HFI245'
+                className='mr-2 rounded-none !border-y-0 !border-r-0'
+                id='backgroundColor'
+                onChange={handleOnChanges}
+                value={state.editor.selectedElement.styles.backgroundColor}
+              />
+            </div>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <Label className='text-muted-foreground'>Background Image</Label>
+            <div className='flex overflow-clip rounded-md border-[1px]'>
+              <div
+                className='w-12'
+                style={{
+                  backgroundImage: state.editor.selectedElement.styles.backgroundImage,
+                }}
+              />
+              <Input
+                placeholder='url()'
+                className='mr-2 rounded-none !border-y-0 !border-r-0'
+                id='backgroundImage'
+                onChange={handleOnChanges}
+                value={state.editor.selectedElement.styles.backgroundImage}
+              />
+            </div>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <Label className='text-muted-foreground'>Image Position</Label>
+            <Tabs
+              onValueChange={(e) =>
+                handleOnChanges({
+                  target: {
+                    id: 'backgroundSize',
+                    value: e,
+                  },
+                })
+              }
+              value={state.editor.selectedElement.styles.backgroundSize?.toString()}
+            >
+              <TabsList className='flex h-fit flex-row items-center justify-between gap-4 rounded-md border-[1px] bg-transparent'>
+                <TabsTrigger value='cover' className='h-10 w-10 p-0 data-[state=active]:bg-muted'>
+                  <ChevronsLeftRightIcon size={18} />
+                </TabsTrigger>
+                <TabsTrigger value='contain' className='h-10 w-10 p-0 data-[state=active]:bg-muted'>
+                  <AlignVerticalJustifyCenter size={22} />
+                </TabsTrigger>
+                <TabsTrigger value='auto' className='h-10 w-10 p-0 data-[state=active]:bg-muted'>
+                  <LucideImageDown size={18} />
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </AccordionContent>
       </AccordionItem>

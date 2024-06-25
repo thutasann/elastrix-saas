@@ -16,7 +16,7 @@ function TextPlaceholder() {
       onDragStart={(e) => {
         handleDragState(e, 'text')
       }}
-      className='flex h-12 w-12 items-center justify-center rounded-lg bg-muted'
+      className='flex h-12 w-12 cursor-grab items-center justify-center rounded-lg bg-muted'
     >
       <TypeIcon size={30} className='text-muted-foreground' />
     </div>

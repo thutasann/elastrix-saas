@@ -56,7 +56,7 @@ function FunnelEditor({ funnelPageId, liveMode }: IFunnelEditor) {
   return (
     <div
       className={clsx(
-        'use-automation-zoom-in mr-[385px] h-full overflow-scroll rounded-md bg-background transition-all',
+        'use-automation-zoom-in mr-[385px] h-full overflow-auto rounded-md bg-background transition-all',
         {
           '!mr-0 !p-0': state.editor.previewMode === true || state.editor.liveMode === true,
           '!w-[850px]': state.editor.device === 'Tablet',

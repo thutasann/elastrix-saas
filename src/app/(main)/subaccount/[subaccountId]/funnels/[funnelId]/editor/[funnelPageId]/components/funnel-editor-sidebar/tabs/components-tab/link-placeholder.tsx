@@ -14,7 +14,7 @@ function LinkPlaceholder() {
     <div
       draggable
       onDragStart={(e) => handleDragStart(e, 'link')}
-      className='flex h-12 w-12 items-center justify-center rounded-lg bg-muted'
+      className='flex h-12 w-12 cursor-grab items-center justify-center rounded-lg bg-muted'
     >
       <Link2Icon size={30} className='text-muted-foreground' />
     </div>

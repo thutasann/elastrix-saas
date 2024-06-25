@@ -14,7 +14,7 @@ function ContactFormPlaceHolder() {
     <div
       draggable
       onDragStart={(e) => handleDragStart(e, 'contactForm')}
-      className='flex h-12 w-12 items-center justify-center rounded-lg bg-muted'
+      className='flex h-12 w-12 cursor-grab items-center justify-center rounded-lg bg-muted'
     >
       <Contact2Icon size={30} className='text-muted-foreground' />
     </div>

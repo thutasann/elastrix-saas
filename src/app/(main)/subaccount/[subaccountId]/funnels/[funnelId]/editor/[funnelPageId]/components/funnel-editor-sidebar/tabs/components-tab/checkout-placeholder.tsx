@@ -2,6 +2,7 @@
 
 import { EditorBtns } from '@/dto/types/globals'
 import { Contact2Icon } from 'lucide-react'
+import Image from 'next/image'
 import React from 'react'
 
 function CheckoutPlaceholder() {
@@ -13,10 +14,10 @@ function CheckoutPlaceholder() {
   return (
     <div
       draggable
-      onDragStart={(e) => handleDragStart(e, 'contactForm')}
+      onDragStart={(e) => handleDragStart(e, 'paymentForm')}
       className='flex h-12 w-12 items-center justify-center rounded-lg bg-muted'
     >
-      <Contact2Icon size={30} className='text-muted-foreground' />
+      <Image src='/assets/stripelogo.png' height={30} width={30} alt='stripe logo' className='object-cover' />
     </div>
   )
 }

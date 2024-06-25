@@ -13,7 +13,7 @@ function VideoPlaceholder() {
     <div
       draggable
       onDragStart={(e) => handleDragStart(e, 'video')}
-      className='flex h-12 w-12 items-center justify-center rounded-lg bg-muted'
+      className='flex h-12 w-12 cursor-grab items-center justify-center rounded-lg bg-muted'
     >
       <Youtube size={30} className='text-muted-foreground' />
     </div>

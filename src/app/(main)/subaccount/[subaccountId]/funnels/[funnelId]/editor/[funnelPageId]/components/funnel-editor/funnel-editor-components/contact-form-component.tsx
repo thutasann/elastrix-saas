@@ -1,3 +1,5 @@
+'use client'
+
 import { EditorElement } from '@/providers/editor/editor-types'
 import React from 'react'
 

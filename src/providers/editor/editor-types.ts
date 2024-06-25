@@ -7,10 +7,15 @@ export type DeviceTypes = 'Desktop' | 'Mobile' | 'Tablet'
  * Editor Element Props
  */
 export type EditorElement = {
+  /** element id */
   id: string
+  /** element styles */
   styles: React.CSSProperties
+  /** element name */
   name: string
+  /** editor buttonss */
   type: EditorBtns
+  /** element content */
   content: EditorElement[] | { href?: string; innerText?: string; src?: string }
 }
 

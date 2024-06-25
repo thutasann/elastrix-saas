@@ -55,7 +55,7 @@ const deleteAnElement = (editorArray: EditorElement[], action: EditorAction): Ed
   })
 }
 
-/** editor reducer */
+/** editor reducer 🚀 */
 export const editorReducer = (state: EditorState, action: EditorAction): EditorState => {
   switch (action.type) {
     case 'ADD_ELEMENT':

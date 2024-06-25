@@ -13,7 +13,7 @@ function TwoColumnPlaceholder() {
     <div
       draggable
       onDragStart={(e) => handleDragStart(e, '2Col')}
-      className='flex h-14 w-14 flex-row gap-[4px] rounded-lg bg-muted/70 p-2'
+      className='flex h-14 w-14 cursor-grab flex-row gap-[4px] rounded-lg bg-muted/70 p-2'
     >
       <div className='h-full w-full rounded-sm border-[1px] border-dashed border-muted-foreground/50 bg-muted'></div>
       <div className='h-full w-full rounded-sm border-[1px] border-dashed border-muted-foreground/50 bg-muted'></div>
