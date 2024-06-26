@@ -19,6 +19,19 @@ export const _getTicketsWithAllRelations = async (laneId: string) => {
   return response
 }
 
+/** get pipelines */
+export const getPipelines = async (subaccountId: string) => {
+  const response = await db.pipeline.findMany({
+    where: { subAccountId: subaccountId },
+    include: {
+      Lane: {
+        include: { Tickets: true },
+      },
+    },
+  })
+  return response
+}
+
 /** get pipeline details */
 export const getPipelineDetails = async (pipelineId: string) => {
   const response = await db.pipeline.findUnique({
