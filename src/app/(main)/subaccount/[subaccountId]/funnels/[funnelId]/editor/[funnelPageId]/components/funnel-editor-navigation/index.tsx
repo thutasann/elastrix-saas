@@ -9,12 +9,13 @@ import { FunnelPage } from '@prisma/client'
 import { ArrowLeftCircle, EyeIcon, Redo2, Undo2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { FocusEventHandler, useEffect } from 'react'
+import React, { FocusEventHandler, useEffect, useState } from 'react'
 import DevicesTab from './devices-tab'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { saveActivityLogsNotification } from '@/lib/server-actions/queries/noti-queries'
 import { useToast } from '@/components/ui/use-toast'
+import { CustomLoader } from '@/components/molecules/loader'
 
 interface IFunnelEditorNavigation {
   funnelId: string
@@ -26,6 +27,7 @@ function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: I
   const router = useRouter()
   const { toast } = useToast()
   const { state, dispatch } = useEditor()
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     dispatch({
@@ -83,6 +85,7 @@ function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: I
   }
 
   const handleOnSave = async () => {
+    setLoading(true)
     const content = JSON.stringify(state.editor.elements)
     const { id, ...funnelPageDetailsWithoutId } = funnelPageDetails
 
@@ -101,12 +104,14 @@ function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: I
         description: `Updated a funnel page | ${response?.name}`,
         subAccountId: subaccountId,
       })
+      setLoading(false)
       toast({
         className: 'z-[100000]',
         title: 'Saved Editor Details',
       })
     } catch (error) {
       console.log('editor save error: ', error)
+      setLoading(false)
       toast({
         variant: 'destructive',
         className: 'z-[100000]',
@@ -168,7 +173,9 @@ function FunnelEditorNavigation({ funnelId, funnelPageDetails, subaccountId }: I
               Last updated {funnelPageDetails.updatedAt.toLocaleDateString()}
             </span>
           </div>
-          <Button onClick={handleOnSave}>Save</Button>
+          <Button disabled={loading} onClick={handleOnSave}>
+            {loading ? <CustomLoader /> : 'Save'}
+          </Button>
         </aside>
       </nav>
     </TooltipProvider>

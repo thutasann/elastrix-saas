@@ -1,17 +1,23 @@
-import { NextResponse } from 'next/server'
+import { db } from '@/lib/db'
 import { stripe } from '@/lib/stripe'
-import { ICreateCheckoutSessionRequest } from '@/dto/types/stripe'
+import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-  const { subAccountConnectAccId, prices }: ICreateCheckoutSessionRequest = await req.json()
-  const origin = req.headers.get('origin')
+  const {
+    subAccountConnectAccId,
+    prices,
+    subaccountId,
+  }: {
+    subAccountConnectAccId: string
+    prices: { recurring: boolean; productId: string }[]
+    subaccountId: string
+  } = await req.json()
 
-  if (!subAccountConnectAccId || !prices.length) {
-    return new NextResponse('Stripe account Id or price Id is missing', {
+  const origin = req.headers.get('origin')
+  if (!subAccountConnectAccId || !prices.length)
+    return new NextResponse('Stripe Account Id or price id is missing', {
       status: 400,
     })
-  }
-
   if (
     !process.env.NEXT_PUBLIC_PLATFORM_SUBSCRIPTION_PERCENT ||
     !process.env.NEXT_PUBLIC_PLATFORM_ONETIME_FEE ||
@@ -21,10 +27,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Fees do not exist' })
   }
 
+  // Not needed unless we want to send payments to this account.
+  //CHALLENGE Transfer money to a connected
+  // const agencyIdConnectedAccountId = await db.subAccount.findUnique({
+  //   where: { id: subaccountId },
+  //   include: { Agency: true },
+  // })
+
   const subscriptionPriceExists = prices.find((price) => price.recurring)
+  // if (!agencyIdConnectedAccountId?.Agency.connectAccountId) {
+  //   console.log('Agency is not connected')
+  //   return NextResponse.json({ error: 'Agency account is not connected' })
+  // }
 
   try {
-    /** stripe checkout session */
     const session = await stripe.checkout.sessions.create(
       {
         line_items: prices.map((price) => ({
@@ -65,19 +81,13 @@ export async function POST(req: Request) {
         },
       },
     )
-  } catch (error: any) {
+  } catch (error) {
     console.log('🔴 Error', error)
+    //@ts-ignore
     return NextResponse.json({ error: error.message })
   }
 }
 
-/**
- * the OPTIONS method is used to handle HTTP OPTIONS requests.
- * @description
- * - When a browser sends a request to a server on a different domain, it often sends an OPTIONS request first to check if the server will allow the actual request.
- * - This OPTIONS request is called a "preflight" request.
- * - The server must respond to this request with the appropriate headers to allow the actual request to be made.
- */
 export async function OPTIONS(request: Request) {
   const allowedOrigin = request.headers.get('origin')
   const response = new NextResponse(null, {
@@ -90,5 +100,6 @@ export async function OPTIONS(request: Request) {
       'Access-Control-Max-Age': '86400',
     },
   })
+
   return response
 }
