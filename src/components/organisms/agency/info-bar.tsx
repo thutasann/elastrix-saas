@@ -53,7 +53,7 @@ function InfoBar({ notifications, role, className, subAccountId }: IInfoBar) {
                 <Bell size={17} />
               </div>
             </SheetTrigger>
-            <SheetContent className='mr-4 mt-4 overflow-auto pr-4'>
+            <SheetContent className='z-[999] mr-4 mt-4 overflow-auto pr-4'>
               <SheetHeader className='text-left'>
                 <SheetTitle>Notifications</SheetTitle>
                 <SheetDescription>
