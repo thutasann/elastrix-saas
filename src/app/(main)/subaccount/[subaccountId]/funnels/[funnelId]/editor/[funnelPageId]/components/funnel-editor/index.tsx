@@ -27,6 +27,25 @@ function FunnelEditor({ funnelPageId, liveMode }: IFunnelEditor) {
   }, [liveMode])
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!state.editor.liveMode || !state.editor.previewMode) return
+      if (e.key === 'Escape') {
+        dispatch({
+          type: 'TOGGLE_LIVE_MODE',
+          payload: { value: false },
+        })
+        dispatch({
+          type: 'TOGGLE_PREVIEW_MODE',
+        })
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [state])
+
+  useEffect(() => {
     const fetchData = async () => {
       const response = await getFunnelPageDetails(funnelPageId)
       if (!response) return
