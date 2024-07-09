@@ -178,19 +178,19 @@ export const sendInvitation = async (role: Role, email: string, agencyId: string
     },
   })
 
-  try {
-    await clerkClient.invitations.createInvitation({
-      emailAddress: email,
-      redirectUrl: process.env.NEXT_PUBLIC_URL,
-      publicMetadata: {
-        throughInvitation: true,
-        role,
-      },
-    })
-  } catch (error) {
-    console.error('cleark send invitation error : ', error)
-    throw error
-  }
+  // try {
+  //   await clerkClient.invitations.createInvitation({
+  //     emailAddress: email,
+  //     redirectUrl: process.env.NEXT_PUBLIC_URL,
+  //     publicMetadata: {
+  //       throughInvitation: true,
+  //       role,
+  //     },
+  //   })
+  // } catch (error) {
+  //   console.error('cleark send invitation error : ', error)
+  //   throw error
+  // }
 
   return response
 }
